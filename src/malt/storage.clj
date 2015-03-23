@@ -21,9 +21,10 @@
                            storage-keyspace
                            {:credentials {:username storage-user
                                           :password storage-password}})]
+      (cp/constant-reconnection-policy 100)
       (log/info "Storage started")
       (assoc component :conn conn)))
-  (cp/constant-reconnection-policy 100)
+
   (stop [component]
     (when conn
       (cc/disconnect conn))
