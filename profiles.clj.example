@@ -1,0 +1,16 @@
+{:dev-env 
+ {:env
+  {:storage-nodes "localhost,"
+   :storage-keyspace "malt"
+   :storage-user "cassandra"
+   :storage-password "cassandra"
+   :configuration-table "configuration"}}
+ :test-env
+ {:env
+  {:storage-nodes "localhost,"
+   :storage-keyspace "malt"
+   :storage-user "cassandra"
+   :storage-password "cassandra"
+   :configuration-table "configuration"}
+   }
+ }
