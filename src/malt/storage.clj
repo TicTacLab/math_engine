@@ -4,6 +4,7 @@
             [clojurewerkz.cassaforte.client :as cc]
             [clojurewerkz.cassaforte.cql :as cql]
             [clojurewerkz.cassaforte.query :refer [where columns]]
+            [clojurewerkz.cassaforte.policies :as cp]
             [clojure.tools.logging :as log]))
 
 (defrecord Storage [conn
@@ -22,7 +23,7 @@
                                           :password storage-password}})]
       (log/info "Storage started")
       (assoc component :conn conn)))
-
+  (cp/constant-reconnection-policy 100)
   (stop [component]
     (when conn
       (cc/disconnect conn))
