@@ -40,5 +40,5 @@
     (session/prolong! session-store ssid))
   (cache/with-cache-by-key storage {:id id :params params}
     (if calc-profile
-      (response/packet-init (utils/with-timer calc* session-store args :calc-profile calc-profile))
+      (response/packet-init (utils/with-timer (calc* session-store args :calc-profile calc-profile)))
       (response/packet-init (calc* session-store args :calc-profile calc-profile)))))

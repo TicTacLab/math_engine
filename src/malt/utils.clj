@@ -86,13 +86,13 @@
   []
   (System/currentTimeMillis))
 
-(defn with-timer [func & args]
-  (let [start (. System (nanoTime))
-        ret (apply func args)
-        time-call
+(defmacro with-timer [& body]
+  `(let [start# (. System (nanoTime))
+        ret# (do ~@body)
+        time-call#
         (/
          (double 
-          (- (. System (nanoTime)) start))
+          (- (. System (nanoTime)) start#))
          1000000.0)]
-    (assoc ret :timer (int time-call))))
+    (assoc ret# :timer (int time-call#))))
 

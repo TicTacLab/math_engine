@@ -86,7 +86,7 @@
 
 (defn extract-with-profile [calc-profile args]
   (if calc-profile
-    (with-timer extract-to-hash args)
+    (with-timer (extract-to-hash args))
     (extract-to-hash args)))
 
 (defn extract-eval

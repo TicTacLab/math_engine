@@ -1,16 +1,19 @@
-{:dev-env 
+{:dev-env
  {:env
-  {:storage-nodes "localhost,"
-   :storage-keyspace "malt"
+  {:storage-nodes       "192.168.167.144,192.168.167.145,192.168.167.146"
+   :storage-keyspace    "malt"
+   :storage-user "malt"
+   :storage-password "CacNeck5"
+   :configuration-table "configuration"
+   :zabbix-host "192.168.167.141"
+   :zabbix-port 10051
+   :monitoring-hostname "dc01m01"}
+  }
+ :test-env
+ {:env
+  {:storage-nodes       "localhost,"
+   :storage-keyspace    "malt"
    :storage-user "cassandra"
    :storage-password "cassandra"
    :configuration-table "configuration"}}
- :test-env
- {:env
-  {:storage-nodes "localhost,"
-   :storage-keyspace "malt"
-   :storage-user "cassandra"
-   :storage-password "cassandra"
-   :configuration-table "configuration"}
-   }
  }

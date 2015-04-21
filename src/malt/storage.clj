@@ -1,6 +1,7 @@
 (ns malt.storage
   (:require [com.stuartsierra.component :as component]
             [schema.core :as s]
+            [metrics.core :as metrics]
             [clojurewerkz.cassaforte.client :as cc]
             [clojurewerkz.cassaforte.cql :as cql]
             [clojurewerkz.cassaforte.query :refer [where columns]]
@@ -23,13 +24,15 @@
                                           :password storage-password}
                             :reconnection-policy (cp/constant-reconnection-policy 100)})]
       (log/info "Storage started")
-      (assoc component :conn conn)))
+      (assoc component
+        :conn conn)))
 
   (stop [component]
     (when conn
       (cc/disconnect conn))
     (log/info "Storage stopped")
-    (assoc component :conn nil)))
+    (assoc component
+      :conn nil)))
 
 
 (def StorageSchema

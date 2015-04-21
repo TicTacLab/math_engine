@@ -22,6 +22,7 @@
                  [com.google.protobuf/protobuf-java "2.5.0"]
                  [com.hazelcast/hazelcast-client "3.1.5"]
                  [com.taoensso/nippy "2.5.2"]
+                 [com.betinvest/zabbix-clojure-agent "0.1.1"]
                  [clojurewerkz/cassaforte "2.0.0"]
                  [environ "1.0.0"]
                  [com.stuartsierra/component "0.2.2"]
