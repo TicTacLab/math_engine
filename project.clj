@@ -39,14 +39,13 @@
                  :init-ns user}
   :uberjar-name "malt-standalone.jar"
   :jvm-opts ["-Dlogback.configurationFile=logback.xml"]
-  :repositories [["snapshots" {:url "scp://bagira.favoritbet.com/home/erlybet/git-mvn/snapshots"
-                               :username [:gpg :env/bagira_username]
-                               :password [:gpg :env/bagira_password]
-                               :private-key-file [:gpg :env/private_key_file]}]
-                 ["releases" {:url "scp://bagira.favoritbet.com/home/erlybet/git-mvn/releases"
-                              :username [:gpg :env/bagira_username]
-                              :password [:gpg :env/bagira_password]
-                              :private-key-file [:gpg :env/private_key_file]}]]
+  :repositories ^:replace [
+["snapshots" {:url "http://10.1.4.197:8080/repository/snapshots"
+                               :username :env
+                               :password :env}]
+["releases" {:url "http://10.1.4.197:8080/repository/internal"
+                               :username :env
+                               :password :env}]]
 
   :plugins [[org.apache.maven.wagon/wagon-ssh-external "2.6"]
             [lein-ring "0.8.2"]
