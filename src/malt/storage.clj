@@ -2,8 +2,8 @@
   (:require [com.stuartsierra.component :as component]
             [schema.core :as s]
             [metrics.core :as metrics]
-            [zabbix-clojure-agent.gauges :as agauge]
             [metrics.meters :as meter]
+            [zabbix-clojure-agent.gauges :as agauge]
             [clojurewerkz.cassaforte.client :as cc]
             [clojurewerkz.cassaforte.cql :as cql]
             [clojurewerkz.cassaforte.query :refer [where columns]]
@@ -43,9 +43,15 @@
   (stop [component]
     (when conn
       (cc/disconnect conn))
+    (when hits (metrics/remove-metric "hits"))
+    (when calls (metrics/remove-metric "calls"))
+    (when cache-hit (metrics/remove-metric ["malt_engine" "cache_hit"]))
     (log/info "Storage stopped")
     (assoc component
-      :conn nil)))
+      :conn nil
+      :hits nil
+      :calls nil
+      :cache-hit nil)))
 
 
 (def StorageSchema

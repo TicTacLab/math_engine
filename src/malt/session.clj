@@ -6,10 +6,12 @@
     [clojure.core.cache :as cache]
     [malt.storage.models :as models]
     [malt.math_parser.xls_types :as xtypes]
-    [malt.math_parser.xls_read :refer 
+    [malt.math_parser.xls_read :refer
      (read-workbook write-workbook map-workbook make-formula-evaluator extract-eval parse-head blank-row?)]
     [malt.math_parser.params :refer (parse-params set-params get-params)]
-    [clojure.set :refer (index)])
+    [clojure.set :refer (index)]
+    [metrics.gauges :as gauge]
+    [metrics.core :as metrics])
   (:import [clojure.lang PersistentArrayMap]
            [java.util.concurrent Semaphore]))
 
@@ -62,18 +64,17 @@
   v)
 
 (defn create! [session-store id ssid]
-  (->                
-   (:session-table session-store)
-   (swap! (fn [table]
-            (if (cache/has? table ssid)
-              table
-              (assoc table ssid
-                     (-> session-store
-                         :storage
-                         (models/get-model-file id)
-                         config-to-workbook
-                         (assoc :ssid ssid))))))
-   (get ssid)))
+  (-> (:session-table session-store)
+      (swap! (fn [table]
+               (if (cache/has? table ssid)
+                 table
+                 (assoc table ssid
+                              (-> session-store
+                                  :storage
+                                  (models/get-model-file id)
+                                  config-to-workbook
+                                  (assoc :ssid ssid))))))
+      (get ssid)))
 
 (defn create-if-not-exists [session-store id ssid]
   (if-let [session (fetch session-store ssid)]
@@ -84,16 +85,21 @@
   (save! session-store ssid (fetch session-store ssid)))
 
 (defrecord SessionStore
-    [session-table session-ttl storage]
+    [session-table session-ttl storage sessions-count]
   ;; session-ttl in seconds
   component/Lifecycle
   (start [component]
-    (->>
-     (cache/ttl-cache-factory {} :ttl (* 1000 session-ttl)) 
-     atom
-     (assoc component :session-table)))
+    (let [session-table (atom (cache/ttl-cache-factory {} :ttl (* 1000 session-ttl)))]
+      (assoc component
+        :session-table session-table
+        :sessions-count (gauge/gauge-fn ["malt_engine" "sessions_count"]
+                                         #(double (count @session-table))))))
+
   (stop  [component]
-    (assoc  component :session-table nil)))
+    (when sessions-count (metrics/remove-metric ["malt_engine" "sessions_count"]))
+    (assoc component
+      :session-table nil
+      :sessions-count nil)))
 
 (def SessionStoreConfig
   {:session-ttl s/Int})
