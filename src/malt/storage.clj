@@ -2,11 +2,14 @@
   (:require [com.stuartsierra.component :as component]
             [schema.core :as s]
             [metrics.core :as metrics]
+            [zabbix-clojure-agent.gauges :as agauge]
+            [metrics.meters :as meter]
             [clojurewerkz.cassaforte.client :as cc]
             [clojurewerkz.cassaforte.cql :as cql]
             [clojurewerkz.cassaforte.query :refer [where columns]]
             [clojurewerkz.cassaforte.policies :as cp]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log])
+  (:import [com.codahale.metrics RatioGauge$Ratio]))
 
 (defrecord Storage [conn
                     storage-nodes
@@ -14,6 +17,9 @@
                     storage-user
                     storage-password
                     configuration-table
+                    cache-hit
+                    hits
+                    calls
                     cache-on]
   component/Lifecycle
 
@@ -22,10 +28,17 @@
                            storage-keyspace
                            {:credentials {:username storage-user
                                           :password storage-password}
-                            :reconnection-policy (cp/constant-reconnection-policy 100)})]
+                            :reconnection-policy (cp/constant-reconnection-policy 100)})
+          hits (meter/meter "hits")
+          calls (meter/meter "calls")]
       (log/info "Storage started")
       (assoc component
-        :conn conn)))
+        :conn conn
+        :hits hits
+        :calls calls
+        :cache-hit (agauge/ratio-gauge-fn ["malt_engine" "cache_hit"]
+                                          #(RatioGauge$Ratio/of (meter/rate-one hits)
+                                                                (meter/rate-one calls))))))
 
   (stop [component]
     (when conn

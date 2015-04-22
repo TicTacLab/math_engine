@@ -1,7 +1,8 @@
 (ns malt.storage.cache
   (:require [clojurewerkz.cassaforte.cql :as cql]
             [clojurewerkz.cassaforte.query :refer [where columns]]
-            [taoensso.nippy :as nippy])
+            [taoensso.nippy :as nippy]
+            [metrics.meters :as meter])
   (:import (com.datastax.driver.core.utils Bytes)))
 
 (defn put [{conn :conn} {model-id :id params :params} value]
@@ -22,7 +23,9 @@
 (defmacro with-cache-by-key [storage key & body]
   `(if (:cache-on ~storage)
      (if-let [result# (fetch ~storage ~key)]
-      result#
+       (do
+         (meter/mark! (:hits ~storage))
+         result#)
       (when-let [result# (do ~@body)]
         (put ~storage ~key result#)
         result#))

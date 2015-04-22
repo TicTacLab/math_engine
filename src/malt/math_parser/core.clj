@@ -10,7 +10,8 @@
     [malt.storage.cache :as cache]
     [malt.storage.models :as models]
     [malt.response :as response]
-    [flatland.protobuf.core :as pb])
+    [flatland.protobuf.core :as pb]
+    [metrics.meters :as meter])
   (:import [malt.session WorkbookConfig]))
 
 (defn #^WorkbookConfig make-evaluator [#^WorkbookConfig wb-config]
@@ -36,6 +37,7 @@
 (defn calc [{storage :storage :as session-store}
             {id :id ssid :ssid params :params :as args}
             & {calc-profile :calc-profile}]
+  (meter/mark! (:calls storage))
   (when (session/fetch session-store ssid)
     (session/prolong! session-store ssid))
   (cache/with-cache-by-key storage {:id id :params params}
