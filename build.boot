@@ -1,6 +1,5 @@
 (set-env!
-  :source-paths #{"src"}
-  :resource-paths #{"resources"}
+  :resource-paths #{"resources" "src"}
   :dependencies '[[org.clojure/clojure "1.5.1"]
                   [org.clojure/data.json "0.2.1"]
                   [com.betinvest/poi "3.9.1"]
@@ -21,7 +20,6 @@
                   [clj-pid "0.1.1"]
                   [org.flatland/protobuf "0.8.1"]
                   [com.google.protobuf/protobuf-java "2.5.0"]
-                  [com.hazelcast/hazelcast-client "3.1.5"]
                   [com.taoensso/nippy "2.5.2"]
                   [com.betinvest/zabbix-clojure-agent "0.1.7"]
                   [clojurewerkz/cassaforte "2.0.0"]
@@ -38,8 +36,9 @@
                            :password "ci1"}})
 (task-options!
   pom  {:project 'malt_engine}
-  aot  {:namespace ['malt_engine.main]}
-  jar  {:main 'malt_engine.main}
+  aot  {:all true}
+  uber {:as-jars true}
+  jar  {:main 'malt.main}
   push {:tag            true
         :ensure-release true
         :repo           "nassau"})
@@ -49,6 +48,10 @@
   []
   (let [tmp (tmp-dir!)]
     (with-pre-wrap fileset
+                   (prn (->> (input-files fileset)
+                             (map tmp-path)
+                             (filter #(.endsWith % ".clj"))
+                             (map boot.util/path->ns)))
                    (empty-dir! tmp)
                    (doseq [f (->> fileset
                                   (input-files)
@@ -75,4 +78,4 @@
         (aot)
         (uber)
         (jar)
-        (push :file-regex #{(re-pattern (format "malt_engine-%s.jar$" version))})))
+        #_(push :file-regex #{(re-pattern (format "malt_engine-%s.jar$" version))})))

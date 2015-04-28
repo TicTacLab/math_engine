@@ -48,8 +48,7 @@
                                :username :env
                                :password :env}]]
 
-  :plugins [[org.apache.maven.wagon/wagon-ssh-external "2.6"]
-            [lein-ring "0.8.2"]
+  :plugins [[lein-ring "0.8.2"]
             [lein-protobuf "0.4.1"]
             [lein-environ "1.0.0"]]
 
@@ -61,7 +60,3 @@
                                    [http-kit.fake "0.2.1"]]}]
              :test [:test-env]}
   :main malt.main)
-
-(cemerick.pomegranate.aether/register-wagon-factory!
- "scp" #(let [c (resolve 'org.apache.maven.wagon.providers.ssh.external.ScpExternalWagon)]
-          (clojure.lang.Reflector/invokeConstructor c (into-array []))))
