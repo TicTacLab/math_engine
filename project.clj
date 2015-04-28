@@ -40,10 +40,10 @@
   :uberjar-name "malt-standalone.jar"
   :jvm-opts ["-Dlogback.configurationFile=logback.xml"]
   :repositories ^:replace [
-["snapshots" {:url "http://10.1.4.197:8080/repository/snapshots"
+["snapshots" {:url "http://nassau.favorit/repository/snapshots"
                                :username :env
                                :password :env}]
-["releases" {:url "http://10.1.4.197:8080/repository/internal"
+["releases" {:url "http://nassau.favorit/repository/internal"
                                :username :env
                                :password :env}]]
 

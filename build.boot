@@ -38,7 +38,7 @@
                            :password "ci1"}})
 (task-options!
   pom  {:project 'malt_engine}
-  aot  {:namespace ['malt-engine.main]}
+  aot  {:namespace ['malt_engine.main]}
   jar  {:main 'malt_engine.main}
   push {:tag            true
         :ensure-release true
