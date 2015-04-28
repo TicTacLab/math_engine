@@ -1,8 +1,8 @@
-(ns malt.math_parser.xls_read
+(ns malt.math-parser.xls-read
   (:use
 ;   [clojure.tools.trace]
     [clojure.java.io :only [file input-stream]]
-    [malt.math_parser.xls_types :as xtypes]
+    [malt.math-parser.xls-types :as xtypes]
     [malt.utils :as utils])
   (:require [taoensso.timbre.profiling :refer (p profile)])
   (:import

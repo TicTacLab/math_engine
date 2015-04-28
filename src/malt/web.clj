@@ -9,7 +9,7 @@
             [malt.web.middleware :refer (wrap-with-web)]
             [malt.storage.models :refer (get-model-file)]
             [malt.storage.calculation-log :as calc-log]
-            [malt.math_parser.core :refer (calc)]
+            [malt.math-parser.core :refer (calc)]
             [malt.utils :refer (string-to-double string-to-integer)]
             [ring.middleware
              [params :refer (wrap-params)]

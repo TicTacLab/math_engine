@@ -1,4 +1,4 @@
-(ns malt.math_parser.math_xls
+(ns malt.math-parser.math-xls
   (:use    [clojure.tools.trace]
            [malt.utils :only (mfn)])
   (:import (org.apache.commons.math3.distribution

@@ -1,4 +1,4 @@
-(ns malt.math_parser.protocols)
+(ns malt.math-parser.protocols)
 
 (defprotocol CastClass
   (extract [this] [this value])

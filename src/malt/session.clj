@@ -5,10 +5,10 @@
     [schema.core :as s]
     [clojure.core.cache :as cache]
     [malt.storage.models :as models]
-    [malt.math_parser.xls_types :as xtypes]
-    [malt.math_parser.xls_read :refer
+    [malt.math-parser.xls-types :as xtypes]
+    [malt.math-parser.xls-read :refer
      (read-workbook write-workbook map-workbook make-formula-evaluator extract-eval parse-head blank-row?)]
-    [malt.math_parser.params :refer (parse-params set-params get-params)]
+    [malt.math-parser.params :refer (parse-params set-params get-params)]
     [clojure.set :refer (index)]
     [metrics.gauges :as gauge]
     [metrics.core :as metrics])

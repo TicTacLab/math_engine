@@ -1,5 +1,5 @@
-(ns malt.math_parser.xls_types
-  (:use [malt.math_parser.math_xls :only [normal-distribution
+(ns malt.math-parser.xls-types
+  (:use [malt.math-parser.math-xls :only [normal-distribution
                                           pascal-distribution
                                           poisson-distribution
                                           binomial-distribution

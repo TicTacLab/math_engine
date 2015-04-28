@@ -1,9 +1,9 @@
-(ns malt.math_parser.params
+(ns malt.math-parser.params
   (:use
    [clojure.tools.trace]
-   [malt.math_parser.xls_read
+   [malt.math-parser.xls-read
     :only (get-cell set-cell cell-with-address sheet-evaluator)]
-   [malt.math_parser.protocols :as proto ]))
+   [malt.math-parser.protocols :as proto ]))
 
 (defn make-param
   [param]

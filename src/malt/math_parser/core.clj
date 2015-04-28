@@ -1,9 +1,9 @@
-(ns malt.math_parser.core
+(ns malt.math-parser.core
   (:require
     [clojure.tools.logging :as logger :only (info error)]
     [clojure.tools.trace :refer (trace)]
-    [malt.math_parser.xls_read :refer (make-formula-evaluator extract-eval)]
-    [malt.math_parser.params :refer [set-params]]
+    [malt.math-parser.xls_read :refer (make-formula-evaluator extract-eval)]
+    [malt.math-parser.params :refer [set-params]]
     [malt.utils :as utils]
     [malt.session :as session]
     [malt.storage :as storage]
