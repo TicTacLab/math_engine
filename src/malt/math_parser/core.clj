@@ -2,7 +2,7 @@
   (:require
     [clojure.tools.logging :as logger :only (info error)]
     [clojure.tools.trace :refer (trace)]
-    [malt.math-parser.xls_read :refer (make-formula-evaluator extract-eval)]
+    [malt.math-parser.xls-read :refer (make-formula-evaluator extract-eval)]
     [malt.math-parser.params :refer [set-params]]
     [malt.utils :as utils]
     [malt.session :as session]

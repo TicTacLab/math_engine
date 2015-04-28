@@ -42,7 +42,9 @@
          ;; blank field fill with default type value
          (catch NullPointerException e (->ErrorItem field default-value nil))
          (catch Exception e
-           (->ErrorItem field default-value (str "value: " value "; exception: " (.getMessage e)))))))
+           (->ErrorItem field default-value (str "value: " value "; exception: " (.getMessage e)))
+           ;(throw e)
+           ))))
 
 ;; validate funcs
 

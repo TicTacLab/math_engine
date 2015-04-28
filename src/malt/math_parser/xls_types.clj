@@ -73,7 +73,7 @@
    
    RefEvalBase
    (extract [this]
-     (extract (.getInnerValueEval this)))
+     (extract (.getInnerValueEval this (.getFirstSheetIndex this))))
       
    HSSFSheet
    (extract [this]  (seq this))

@@ -1,9 +1,9 @@
-(ns malt.formula_test
+(ns malt.formula-test
   (:use clojure.test
         clojure.tools.trace
-        malt.math_parser.core
-        [malt.math_parser.xls_read :as r]
-        [malt.math_parser.math_xls :as m]))
+        malt.math-parser.core
+        [malt.math-parser.xls-read :as r]
+        [malt.math-parser.math-xls :as m]))
 
 (def path-test-model "math_models/for_test.xlsx")
 
