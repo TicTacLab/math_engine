@@ -23,18 +23,18 @@
         {:keys [session-ttl cache-on rest-port]} configuration
         {:keys [monitoring-hostname zabbix-host zabbix-port]} environ/env]
     (component/map->SystemMap
-      {:storage       (storage/new-storage (assoc storage
-                                             :cache-on cache-on
-                                             :storage-nodes storage-nodes))
+      {:storage         (storage/new-storage (assoc storage
+                                               :cache-on cache-on
+                                               :storage-nodes storage-nodes))
 
-       :session-store (component/using
-                        (s/new-session-store {:session-ttl session-ttl})
-                        [:storage])
-       :web           (component/using
-                        (w/new-web {:host "0.0.0.0" :port rest-port})
-                        [:storage :session-store])
+       :session-store   (component/using
+                          (s/new-session-store {:session-ttl session-ttl})
+                          [:storage])
+       :web             (component/using
+                          (w/new-web {:host "0.0.0.0" :port rest-port})
+                          [:storage :session-store])
        :zabbix-reporter (zabbix/new-zabbix-reporter
-                          {:hostname monitoring-hostname
-                           :zabbix-host zabbix-host
-                           :zabbix-port zabbix-port
+                          {:hostname         monitoring-hostname
+                           :zabbix-host      zabbix-host
+                           :zabbix-port      (Integer/valueOf zabbix-port)
                            :interval-minutes 1})})))
