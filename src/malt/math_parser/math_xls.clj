@@ -72,7 +72,7 @@
 
 (defmulti poisson-distribution
   "function for calc Binomial distribution with PDF or CDF versions"
-  (fn [_ mean  cumulative]
+  (fn [x mean  cumulative]
     (true? cumulative)))
 (defmethod poisson-distribution true  [x mean cumulative]
   (-> (->PoissonDistributionCDF x mean) .udf-calc))

@@ -10,7 +10,6 @@
                  [org.apache.xmlbeans/xmlbeans "2.6.0"]
                  [dom4j/dom4j "1.6.1"]
                  [org.apache.commons/commons-math3 "3.1.1"]
-                 [overtone/at-at "1.1.1"]
                  [org.clojure/tools.trace "0.7.5"]
                  [org.clojure/tools.cli "0.2.2"]
                  [org.slf4j/slf4j-api "1.7.7"]
