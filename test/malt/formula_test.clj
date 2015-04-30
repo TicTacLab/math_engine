@@ -3,36 +3,35 @@
         clojure.tools.trace
         malt.math-parser.core
         [malt.math-parser.xls-read :as r]
-        [malt.math-parser.math-xls :as m]))
+        [malt.math-parser.math-xls :as m])
+  (:require [malt.math-parser.xls-types :as xtypes])
+  (:import [org.apache.poi.hssf.usermodel HSSFWorkbook]))
 
-(def path-test-model "math_models/for_test.xlsx")
+(defn roughly= [x y]
+  (< (Math/abs (- x y))
+     0.0001))
 
-(comment
-(deftest formula-replace-test
-  (is (= "POISSON(1,2,TRUE)" (m/poissson-replace-bool-int "POISSON(1,2,1)")))
-  (is (= "NORMDIST(1,2,3,4)" (m/norm-dist-replace "_xlfn.NORM.DIST(1,2,3,4)"))))
-)
+(defn create-cell []
+  (let [wb (HSSFWorkbook.)
+        sh (.createSheet wb "Test Sheet")
+        rw (.createRow sh 0)]
+    (.createCell rw 0)))
 
-(deftest formula-test
-  (let [wb (r/read-workbook path-test-model)
-        evaluator (do (r/udfs-wb wb)
-                      (r/make-formula-evaluator wb))
-        sheet  (->> (r/sheets wb) first)
-        result (r/sheet-evaluator sheet evaluator)
-        ]
-    (is (= {:price 0.36944134018176367, :id 1.0} (first result)))
-    (is (= {:price 0.023647261968885933, :id 2.0} (second result)))
-    (is (= {:price 5.480047776096421E-7, :id 3.0} (nth result 2)))
-    (is (= {:price "VALUE!", :id 4.0} (nth result 3)))
-    (is (= {:price "formula error:42", :id 5.0} (nth result 4)))
-    (is (= {:id 6.0} (nth result 5)))
-    (is (= {:id  7.0} (nth result 6)))
-    
-    (comment
-      (is (= {:price 0.36944134018176367  :id 1.0} (first result)))
-      (is (= {:price 0.023647261968885933 :id 2.0} (second result)))
-      (is (= {:price 0.75     :id 4.0}             (nth result 3)))
-      (is (= {:price 0.5      :id 5.0}             (nth result 4)))
-      (is (= {:price 1.0      :id 3.0} (nth result 2))))
-                                        
-    ))
+(defn eval-formula [cl formula]
+  (.setCellFormula cl formula)
+  (xtypes/extract cl))
+
+(deftest normdist
+  (let [cl (create-cell)]
+    (is (roughly= (m/normal-distribution 96.6, 300, 11.45, false)
+                  (eval-formula cl "NORMDIST(96.6,300,11.45,FALSE)")))))
+
+(deftest poisson
+  (let [cl (create-cell)]
+    (is (roughly= (m/poisson-distribution 1, 2, false)
+                  (eval-formula cl "POISSON(1,2,FALSE)")))))
+
+(deftest critbinom
+  (let [cl (create-cell)]
+    (is (roughly= (m/binom-inv 96.6, 0.1, 0.2)
+                  (eval-formula cl "CRITBINOM(96.6,0.1,0.2)")))))

@@ -194,8 +194,7 @@
    (extract [this] this))
 
 (defn register-fun! [nm fun]
-  (when-not (contains? (WorkbookEvaluator/getSupportedFunctionNames) nm)
-    (WorkbookEvaluator/registerFunction nm fun)))
+  (WorkbookEvaluator/registerFunction nm fun))
 
 ;;; NORMDIST impementation fun
 
@@ -230,12 +229,10 @@
     (evaluate [col-index  row-index x mean cumulative]
       (let [cumulative-value (extract cumulative)
             x-value (extract  x)
-            mean-value (extract mean)
-            ]
-		(if (every? #(and (or (integer? %) (float? %)) (>= % 0)) [x-value mean-value])
+            mean-value (extract mean)]
+        (if (every? #(and (or (integer? %) (float? %)) (>= % 0)) [x-value mean-value])
 		  (NumberEval. (poisson-distribution x-value mean-value cumulative-value))
-		  (StringEval. (str [x-value mean-value ]))
-		  )))))
+		  (StringEval. (str [x-value mean-value ])))))))
 
 (register-fun! "POISSON" poisson)
 
@@ -250,9 +247,8 @@
             x (extract-operand args 0 row col)
             mean (extract-operand args 1 row col)
             standard_dev (extract-operand args 2 row col)
-            cumulative (extract-operand args 3 row col)
-            ]
-		(if (every? #(or (integer? %) (float? %)) [standard_dev x mean])
+            cumulative (extract-operand args 3 row col)]
+        (if (every? #(or (integer? %) (float? %)) [standard_dev x mean])
           (NumberEval. (normal-distribution x mean standard_dev cumulative))
           (StringEval. (str [x mean standard_dev])))))))
 
@@ -327,11 +323,9 @@
     (evaluate [col-index  row-index trials probability_s alpha]
       (let [trials-value (extract trials)
             probability_s-value (extract  probability_s)
-            alpha-value (extract alpha)
-            ]
-		(if (every? #(or (integer? %) (float? %)) [trials-value probability_s-value alpha-value])
+            alpha-value (extract alpha)]
+        (if (every? #(or (integer? %) (float? %)) [trials-value probability_s-value alpha-value])
           (NumberEval. (double (binom-inv trials-value probability_s-value alpha-value)))
-		  (StringEval. (str [trials-value probability_s-value alpha-value ]))
-		  )))))
+          (StringEval. (str [trials-value probability_s-value alpha-value ])))))))
 
 (register-fun! "CRITBINOM" critbinom-free)

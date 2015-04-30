@@ -2,10 +2,10 @@
   :description "REST FOR CAST EXCEL"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/data.json "0.2.1"]
-                 ;[com.betinvest/poi "3.9.1"]
-                 [org.apache.poi/poi "3.11"]
-                 [org.apache.poi/poi-ooxml "3.11"]
-                 [org.apache.poi/poi-ooxml-schemas "3.11"]
+                 [com.betinvest/poi "3.11-20150430"]
+                 ;[org.apache.poi/poi "3.11"]
+                 [org.apache.poi/poi-ooxml "3.11" :exclusions [org.apache.poi/poi]]
+                 [org.apache.poi/poi-ooxml-schemas "3.11" :exclusions [org.apache.poi/poi]]
                  [commons-codec/commons-codec "1.9"]
                  [org.apache.xmlbeans/xmlbeans "2.6.0"]
                  [dom4j/dom4j "1.6.1"]
@@ -39,13 +39,12 @@
                  :init-ns user}
   :uberjar-name "malt-standalone.jar"
   :jvm-opts ["-Dlogback.configurationFile=logback.xml"]
-  :repositories ^:replace [
-["snapshots" {:url "http://nassau.favorit/repository/snapshots"
-                               :username :env
-                               :password :env}]
-["releases" {:url "http://nassau.favorit/repository/internal"
-                               :username :env
-                               :password :env}]]
+  :repositories ^:replace [["snapshots" {:url "http://nassau.favorit/repository/snapshots"
+                                         :username :env
+                                         :password :env}]
+                           ["releases" {:url "http://nassau.favorit/repository/internal"
+                                        :username :env
+                                        :password :env}]]
 
   :plugins [[lein-ring "0.8.2"]
             [lein-protobuf "0.4.1"]
