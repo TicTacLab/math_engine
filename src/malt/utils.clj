@@ -72,15 +72,6 @@
             [l2 c2] (drop-last-element c1)
             l3  (concat l2 l1)
             ] (conj c2 l3))))
-(defn mfn [f]
-  (let [mem (atom {})]
-    (fn [& args]
-      (if-let [e (find @mem args)]
-        (val e)
-        (let [ret (apply f args)]
-          (swap! mem assoc args ret)
-          ret)))))
-
 (defn ^Integer
   get-timestamp
   []

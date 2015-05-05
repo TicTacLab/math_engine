@@ -1,6 +1,5 @@
 (ns malt.math-parser.math-xls
-  (:use    [clojure.tools.trace]
-           [malt.utils :only (mfn)])
+  (:use    [clojure.tools.trace])
   (:import (org.apache.commons.math3.distribution
             NormalDistribution
             PascalDistribution
@@ -111,8 +110,8 @@
     (:value (find-inv trials probability_s alpha))
     'error))
 
-(def binom-inv (mfn binom-inv))
-(def poisson-distribution (mfn poisson-distribution))
+(def binom-inv (memoize binom-inv))
+(def poisson-distribution (memoize poisson-distribution))
 
 (defn to-bool [arg]
   (condp = (first arg)
