@@ -7,7 +7,6 @@
                                           norm-dist-replace
                                           sum-replace-long
                                           binom-inv]]
-        [malt.utils :only [utry timer]]
         [clojure.tools.logging :as logger :only (info error)]
         [clojure.tools.trace :only (trace)] 
         )
@@ -45,15 +44,16 @@
 (defn formula-eval
   "eval excel formulas"
   ([cell]
-     (->>
-      (.. cell getSheet getWorkbook getCreationHelper createFormulaEvaluator)
-      (formula-eval cell)
-      ))
+   (formula-eval cell (-> cell
+                          (.getSheet)
+                          (.getWorkbook)
+                          (.getCreationHelper)
+                          (.createFormulaEvaluator))))
   ([cell evaluator]
-     (try
-       (.evaluate evaluator cell)
-       (catch Exception e
-         (logger/error (.getMessage e) (formula-eval-error cell))))))
+   (try
+     (.evaluate evaluator cell)
+     (catch Exception e
+       (logger/error e (formula-eval-error cell))))))
   
 
 (extend-protocol CastClass

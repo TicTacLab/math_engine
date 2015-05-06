@@ -5,8 +5,6 @@
             [metrics.meters :as meter]
             [zabbix-clojure-agent.gauges :as agauge]
             [clojurewerkz.cassaforte.client :as cc]
-            [clojurewerkz.cassaforte.cql :as cql]
-            [clojurewerkz.cassaforte.query :refer [where columns]]
             [clojurewerkz.cassaforte.policies :as cp]
             [clojure.tools.logging :as log])
   (:import [com.codahale.metrics RatioGauge$Ratio]))

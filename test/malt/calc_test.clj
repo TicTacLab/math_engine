@@ -1,6 +1,6 @@
 (ns malt.calc-test
   (:require [malt.system :as s]
-            [malt.math_parser.core :as parser]
+            [malt.math-parser.core :as parser]
             [malt.session :as sess]
             [clojure.test :refer :all]
             [com.stuartsierra.component :as component]
@@ -11,7 +11,7 @@
   (let [sys (component/start (s/new-system environ/env))]
     (try
       (let [session-store (:session-store sys)]
-        (sess/save! session-store "BADA55" (sess/config-to-workbook {:file           (io/file "math_models/test-model.xls")
+        (sess/save! session-store "BADA55" (sess/config-to-workbook {:file           (io/file "test/malt/test-model.xls")
                                                                      :in_sheet_name  "IN"
                                                                      :out_sheet_name "OUT"
                                                                      :id             1}))
@@ -25,34 +25,30 @@
                  #{{:coef    2.0
                     :id      1.0
                     :m_code  "MATCH_BETTING"
-                    :market  nil
+                    :market  "3 way - Who will win the match"
                     :o_code  "HOME"
                     :outcome 1.0
-                    :param   999999.0
-                    :param2  nil}
+                    :param   999999.0}
                    {:coef    2.0
                     :id      2.0
                     :m_code  "MATCH_BETTING"
-                    :market  nil
+                    :market  "3 way - Who will win the match"
                     :o_code  "DRAW"
                     :outcome "X"
-                    :param   999999.0
-                    :param2  nil}
+                    :param   999999.0}
                    {:coef    2.0
                     :id      3.0
                     :m_code  "MATCH_BETTING"
-                    :market  nil
+                    :market  "3 way - Who will win the match"
                     :o_code  "AWAY"
                     :outcome 2.0
-                    :param   999999.0
-                    :param2  nil}
+                    :param   999999.0}
                    {:coef    2.0
                     :id      4.0
                     :m_code  "MATCH_DOUBLE_CHANCE"
                     :market  "Match Double Chance"
                     :o_code  "HOME_DRAW"
                     :outcome "1X"
-                    :param   999999.0
-                    :param2  nil}}))))
+                    :param   999999.0}}))))
       (finally
         (component/stop sys)))))

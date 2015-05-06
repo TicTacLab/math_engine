@@ -30,7 +30,7 @@
   (let [args (-> req
                  req/body-string
                  (json/parse-string true)
-                 (update-in [:id] #(Integer. %))
+                 (update-in [:id] #(Integer/valueOf %))
                  (update-in [:params] #(mapv param-to-value %)))
         result (or (calc session-store args :calc-profile calc-profile)
                    {:error "Service is busy"})]

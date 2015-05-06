@@ -1,9 +1,8 @@
 (ns malt.math-parser.params
-  (:use
-   [clojure.tools.trace]
-   [malt.math-parser.xls-read
-    :only (get-cell set-cell cell-with-address sheet-evaluator)]
-   [malt.math-parser.protocols :as proto ]))
+  (:require [clojure.tools.trace :refer [trace]]
+            [malt.math-parser.xls-read
+             :refer [get-cell set-cell cell-with-address sheet-evaluator]]
+            [malt.math-parser.xls-types :as xtypes]))
 
 (defn make-param
   [param]
@@ -38,7 +37,7 @@
         sheet (:in-sheet config)
         address  (map #(let [[r c ] (param-address % params)]
                          (get-cell sheet r c))ids)]
-    (map proto/extract address)))
+    (map xtypes/extract address)))
 
 (defn set-param 
   ;;; set value of cell new is map with address of param cell
@@ -49,8 +48,7 @@
         sheet (:in-sheet config)
         r (first (get params {:id id}))
         row (:row r) 
-        col (:col r)
-        ]
+        col (:col r)]
     (if (or (nil? row ) (nil? col))
       (do (throw (Exception. (str "No such param id: " id)))
           config)

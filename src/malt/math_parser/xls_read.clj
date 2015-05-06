@@ -78,8 +78,7 @@
             rest
             (map xtypes/extract)
             (map  #(map fn %))
-            (map #(values-to-map head %))
-            ))))
+            (map #(values-to-map head %))))))
 
 (defn extract-to-hash [{:keys [evaluator out-header cell]}]
   (zipmap out-header (xtypes/extract cell evaluator)))

@@ -14,3 +14,4 @@
      (cr/bench
        @(http/post "http://localhost:3000/model/calc/binary"
                    {:body (rand-nth in-params-json)}))))
+ 

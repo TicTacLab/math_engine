@@ -1,4 +1,4 @@
-(ns malt.response_test
+(ns malt.response-test
   (:require [clojure.test :refer :all]
             [flatland.protobuf.core :as pb]
             [malt.response :refer :all])

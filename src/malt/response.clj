@@ -1,7 +1,6 @@
 (ns malt.response
   (:use [flatland.protobuf.core :only (protodef protobuf protobuf-dump protobuf-load)]
-        [clojure.tools.logging :as logger]
-        [malt.utils :only (not-nil?)])
+        [clojure.tools.logging :as log])
   (:import [outcome Outcome$OutcomeProto
                     Outcome$Packet
                     Outcome$ErrorProto]
@@ -59,11 +58,10 @@
   [id market outcome coef param m_code o_code param2 mgp_code mn_code mgp_weight timer error]
   OutcomeProtocol
   (pack [this]
-    (let [errors
-          (filter #(string? (:error %))
-                  [id market outcome coef param m_code o_code param2 timer])]
-      (when (not (empty? errors))
-        (logger/error errors))
+    (let [errors (filter #(string? (:error %))
+                         [id market outcome coef param m_code o_code param2 timer])]
+      (when (seq errors)
+        (log/error errors))
 
       (protobuf OutcomeProto
                 :id (:value id)
@@ -78,8 +76,7 @@
                 :mn_code (:value mn_code)
                 :mgp_weight (:value mgp_weight)
                 :timer (:value timer)
-                :errors (reduce (fn [acc x] (conj acc (pack x))) nil errors)
-                ))))
+                :errors (reduce (fn [acc x] (conj acc (pack x))) nil errors)))))
 
 (defn outcome-init [o]
   (-> o
