@@ -60,9 +60,6 @@
   (pack [this]
     (let [errors (filter #(string? (:error %))
                          [id market outcome coef param m_code o_code param2 timer])]
-      (when (seq errors)
-        (log/error errors))
-
       (protobuf OutcomeProto
                 :id (:value id)
                 :market (:value market)
