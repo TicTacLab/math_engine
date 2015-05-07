@@ -55,7 +55,7 @@
 ;; outcome item
 
 (defrecord OutcomeItem
-  [id market outcome coef param m_code o_code param2 mgp_code mn_code mgp_weight timer error]
+  [id market outcome coef param m_code o_code param2 mgp_code mn_code mgp_weight mn_weight timer error]
   OutcomeProtocol
   (pack [this]
     (let [errors (filter #(string? (:error %))
@@ -72,6 +72,7 @@
                 :mgp_code (:value mgp_code)
                 :mn_code (:value mn_code)
                 :mgp_weight (:value mgp_weight)
+                :mn_weight (:value mn_weight)
                 :timer (:value timer)
                 :errors (reduce (fn [acc x] (conj acc (pack x))) nil errors)))))
 
@@ -88,6 +89,7 @@
       (update-in [:mgp_code] #(item-string "mgp_code" %))
       (update-in [:mn_code] #(item-string "mn_code" %))
       (update-in [:mgp_weight] #(item-integer "mgp_weight" %))
+      (update-in [:mn_weight] #(item-integer "mn_weight" %))
       (update-in [:timer] #(when % (item-integer "timer" %)))
       (assoc :error nil)
       (map->OutcomeItem)))

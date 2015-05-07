@@ -28,27 +28,31 @@
                     :market  "3 way - Who will win the match"
                     :o_code  "HOME"
                     :outcome 1.0
-                    :param   999999.0}
+                    :param   999999.0
+                    :mn_weight 1.0}
                    {:coef    2.0
                     :id      2.0
                     :m_code  "MATCH_BETTING"
                     :market  "3 way - Who will win the match"
                     :o_code  "DRAW"
                     :outcome "X"
-                    :param   999999.0}
+                    :param   999999.0
+                    :mn_weight 2.0}
                    {:coef    2.0
                     :id      3.0
                     :m_code  "MATCH_BETTING"
                     :market  "3 way - Who will win the match"
                     :o_code  "AWAY"
                     :outcome 2.0
-                    :param   999999.0}
+                    :param   999999.0
+                    :mn_weight 3.0}
                    {:coef    2.0
                     :id      4.0
                     :m_code  "MATCH_DOUBLE_CHANCE"
                     :market  "Match Double Chance"
                     :o_code  "HOME_DRAW"
                     :outcome "1X"
-                    :param   999999.0}}))))
+                    :param   999999.0
+                    :mn_weight 4.0}}))))
       (finally
         (component/stop sys)))))
