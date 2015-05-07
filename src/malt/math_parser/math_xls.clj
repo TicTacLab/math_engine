@@ -110,9 +110,6 @@
     (:value (find-inv trials probability_s alpha))
     'error))
 
-(def binom-inv (memoize binom-inv))
-(def poisson-distribution (memoize poisson-distribution))
-
 (defn to-bool [arg]
   (condp = (first arg)
     \1 "TRUE)"
@@ -148,4 +145,12 @@
                                 (clojure.string/join "+" args)
                                 formula
                                 ))))
+
+;; MOMISE
+
+(def binom-inv (memoize binom-inv))
+(def poisson-distribution (memoize poisson-distribution))
+(def binomial-distribution (memoize binomial-distribution))
+(def pascal-distribution (memoize pascal-distribution))
+(def normal-distribution (memoize normal-distribution))
 

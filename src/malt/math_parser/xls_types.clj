@@ -215,12 +215,8 @@
 (defn extract-operand [args n row col]
   (-> (nth args n) (OperandResolver/getSingleValue  row col) extract))
 
-
-
-;; install normdist 
+;; install normdist
 (register-fun! "NORMDIST" normdist)
-
-
 
 ;;; POISSON DISTRIBUTION
 
@@ -235,7 +231,6 @@
 		  (StringEval. (str [x-value mean-value ])))))))
 
 (register-fun! "POISSON" poisson)
-
 
 ;;; NORM.DIST function implementation.
 
