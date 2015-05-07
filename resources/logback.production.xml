@@ -6,14 +6,10 @@
         <encoder>
             <pattern>%5p | %d | [%t] ||| %m%n</pattern>
         </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <maxIndex>1</maxIndex>
-            <FileNamePattern>/var/log/malt_engine/malt_engine.log.%i</FileNamePattern>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <maxHistory>3</maxHistory>
+            <FileNamePattern>/var/log/malt_engine/malt_engine.%d{yyyy-MM-dd}.log</FileNamePattern>
         </rollingPolicy>
-
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>100KB</MaxFileSize>
-        </triggeringPolicy>
     </appender>
 
     <root level="INFO">
