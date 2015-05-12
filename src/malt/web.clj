@@ -25,13 +25,15 @@
                (catch Exception e value))
    :id    (string-to-integer id)})
 
-(defn calc-handler [{{session-store :session-store} :web :as req}
+(defn calc-handler [{{session-store :session-store} :web
+                    {ssid :ssid} :params :as req}
                     & {:keys [calc-profile] :or {calc-profile false}}]
   (let [args (-> req
                  req/body-string
                  (json/parse-string true)
                  (update-in [:id] #(Integer/valueOf %))
-                 (update-in [:params] #(mapv param-to-value %)))
+                 (update-in [:params] #(mapv param-to-value %))
+                 (assoc :ssid ssid))
         result (or (calc session-store args :calc-profile calc-profile)
                    {:error "Service is busy"})]
     (calc-log/write! (:storage session-store) (:ssid args) (:id args) (:params args) result)
@@ -52,8 +54,8 @@
 
   (GET "/model/in-params" req (models-in-params-handler req))
 
-  (POST   "/model/calc" req (calc-handler req :calc-profile true))
-  (POST   "/model/calc/binary" req (calc-handler req :calc-profile false))
+  (POST   "/model/calc/:ssid" req (calc-handler req :calc-profile true))
+  (POST   "/model/calc/:ssid/binary" req (calc-handler req :calc-profile false))
   (route/not-found "<h1>Page not found!</h1>"))
 
 (defn app [web]
