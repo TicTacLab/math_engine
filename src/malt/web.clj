@@ -28,6 +28,7 @@
 (defn calc-handler [{{session-store :session-store} :web
                     {ssid :ssid} :params :as req}
                     & {:keys [calc-profile] :or {calc-profile false}}]
+  (log/infof "Get request with ssid: " ssid)
   (let [args (-> req
                  req/body-string
                  (json/parse-string true)
