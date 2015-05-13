@@ -98,7 +98,6 @@
 (defmulti packet-init :type)
 
 (defmethod packet-init :OUTCOMES [outcomes]
-  (println "OUTCOME")
   (->> outcomes
        (:data)
        (map outcome-init)
@@ -108,7 +107,6 @@
        (protobuf-dump)))
 
 (defmethod packet-init :ERROR [error]
-  (println "ERROR")
   (->> error
        (protobuf Packet)
        (protobuf-dump)))
