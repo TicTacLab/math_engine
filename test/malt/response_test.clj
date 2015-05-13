@@ -31,14 +31,6 @@
     (is (is-float? (:value (item-float "param" 1.0))))))
 
 (deftest
-  outcome-item-test
-  (testing "outcome item fail"
-    (let [outcome test-outcome-2
-          outcome-item (outcome-init outcome)]
-      (is (= "value: ERROR!!; exception: java.lang.String cannot be cast to java.lang.Number"
-             (:err (first (:errors (pack outcome-item)))))))))
-
-(deftest
   gen-outcome-message
   (testing
     (is (contains? (pb/protobuf-load Packet

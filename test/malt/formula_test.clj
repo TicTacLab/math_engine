@@ -24,7 +24,12 @@
 (deftest poisson
   (let [cl (create-cell)]
     (is (th/roughly= (m/poisson-distribution 1, 2, false)
-                  (eval-formula cl "POISSON(1,2,FALSE)")))))
+                  (eval-formula cl "POISSON(1,2,FALSE)"))))
+
+  (let [cl (create-cell)]
+    (is (= "VALUE!"
+           (eval-formula cl "POISSON(1,0,FALSE)"))
+        "should return error on mean=0")))
 
 (deftest critbinom
   (let [cl (create-cell)]

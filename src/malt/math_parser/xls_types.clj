@@ -224,11 +224,12 @@
   (proxy [Fixed3ArgFunction] []
     (evaluate [col-index  row-index x mean cumulative]
       (let [cumulative-value (extract cumulative)
-            x-value (extract  x)
+            x-value (extract x)
             mean-value (extract mean)]
-        (if (every? #(and (or (integer? %) (float? %)) (>= % 0)) [x-value mean-value])
-		  (NumberEval. (poisson-distribution x-value mean-value cumulative-value))
-		  (StringEval. (str [x-value mean-value ])))))))
+        (if (and (number? x-value) (>= x-value 0)
+                 (number? mean-value) (> mean-value 0))
+          (NumberEval. (poisson-distribution x-value mean-value cumulative-value))
+          (StringEval. "VALUE!"))))))
 
 (register-fun! "POISSON" poisson)
 
@@ -245,7 +246,7 @@
             cumulative (extract-operand args 3 row col)]
         (if (every? #(or (integer? %) (float? %)) [standard_dev x mean])
           (NumberEval. (normal-distribution x mean standard_dev cumulative))
-          (StringEval. (str [x mean standard_dev])))))))
+          (StringEval. "VALUE!"))))))
 
 (def normdist-udf (AggregatingUDFFinder.  (into-array [(DefaultUDFFinder. (into-array ["_xlfn.NORM.DIST"])  (into-array [normdist-free]))])))
 
@@ -263,7 +264,7 @@
             ]
 		(if (every? #(or (integer? %) (float? %)) [number_f number_s probability_s])
           (NumberEval. (pascal-distribution number_f number_s probability_s cumulative))
-          (StringEval. (str [number_f number_s probability_s cumulative])))))))
+          (StringEval. "VALUE!"))))))
 
 (def pascal-udf (AggregatingUDFFinder.  (into-array [(DefaultUDFFinder. (into-array ["_xlfn.NEGBINOM.DIST"])  (into-array [pascal-distribution-free]))])))
 
@@ -281,7 +282,7 @@
             ]
 		(if (every? #(or (integer? %) (float? %)) [number_s probability_s trials])
           (NumberEval. (binomial-distribution number_s trials probability_s cumulative))
-          (StringEval. (str [number_s trials probability_s cumulative])))))))
+          (StringEval. "VALUE!"))))))
 
 (def binomial-udf (AggregatingUDFFinder.
                    (into-array [(DefaultUDFFinder.
@@ -303,7 +304,7 @@
             ]
 		(if (every? #(or (integer? %) (float? %)) [trials probability_s alpha])
           (NumberEval. (double (binom-inv trials probability_s alpha)))  ;;; DOUBLE!!!!
-          (StringEval. (str [trials probability_s alpha])))))))
+          (StringEval. "VALUE!"))))))
 
 (def binom-inv-udf (AggregatingUDFFinder.
                     (into-array [(DefaultUDFFinder.
@@ -321,6 +322,6 @@
             alpha-value (extract alpha)]
         (if (every? #(or (integer? %) (float? %)) [trials-value probability_s-value alpha-value])
           (NumberEval. (double (binom-inv trials-value probability_s-value alpha-value)))
-          (StringEval. (str [trials-value probability_s-value alpha-value ])))))))
+          (StringEval. "VALUE!"))))))
 
 (register-fun! "CRITBINOM" critbinom-free)
