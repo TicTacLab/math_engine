@@ -17,7 +17,6 @@ message OutcomeProto
     required string m_code = 6;
     required string o_code = 7;
     optional float param2 = 8;
-    repeated ErrorProto errors = 9;
     optional int32 timer = 10;
     optional string mgp_code = 11;
     optional string mn_code = 12;

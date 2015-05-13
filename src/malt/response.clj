@@ -39,11 +39,7 @@
     (->ErrorItem field value nil)
     (try (->ErrorItem field (translator value) nil)
          ;; blank field fill with default type value
-         (catch NullPointerException e (->ErrorItem field default-value nil))
-         (catch Exception e
-           (->ErrorItem field default-value (str "value: " value "; exception: " (.getMessage e)))
-           ;(throw e)
-           ))))
+         (catch Exception e (->ErrorItem field default-value nil)))))
 
 ;; validate funcs
 
@@ -73,8 +69,7 @@
                 :mn_code (:value mn_code)
                 :mgp_weight (:value mgp_weight)
                 :mn_weight (:value mn_weight)
-                :timer (:value timer)
-                :errors (reduce (fn [acc x] (conj acc (pack x))) nil errors)))))
+                :timer (:value timer)))))
 
 (defn outcome-init [o]
   (-> o
@@ -103,6 +98,7 @@
 (defmulti packet-init :type)
 
 (defmethod packet-init :OUTCOMES [outcomes]
+  (println "OUTCOME")
   (->> outcomes
        (:data)
        (map outcome-init)
@@ -112,6 +108,7 @@
        (protobuf-dump)))
 
 (defmethod packet-init :ERROR [error]
+  (println "ERROR")
   (->> error
        (protobuf Packet)
        (protobuf-dump)))
