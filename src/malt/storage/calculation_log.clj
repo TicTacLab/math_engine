@@ -4,7 +4,7 @@
             [cheshire.core :as json]))
 
 (defn write! [{conn :conn} session-id model-id in-params out-params]
-  (cql/insert conn "calculation_log" {:session_id session-id
+  (cql/insert-async conn "calculation_log" {:session_id session-id
                                       :model_id   model-id
                                       :in_params  (json/generate-string in-params)
                                       :out_params out-params}))

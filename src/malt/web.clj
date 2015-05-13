@@ -15,6 +15,7 @@
              [params :refer (wrap-params)]
              [keyword-params :refer (wrap-keyword-params)]]
             [ring.util.request :as req]
+            [ring.util.response :as res]
             [cheshire.core :as json]
             [clojure.pprint :refer (pprint)]
             [malt.session :as session]
@@ -37,7 +38,8 @@
         result (or (calc session-store args :calc-profile calc-profile)
                    {:error "Service is busy"})]
     (calc-log/write! (:storage session-store) (:ssid args) (:id args) (:params args) result)
-    {:body (io/input-stream result)}))
+    (res/content-type {:body (io/input-stream result)}
+                      "application/octet-stream")))
 
 (defn models-in-params-handler [{web :web
                                  params :params :as req}]
