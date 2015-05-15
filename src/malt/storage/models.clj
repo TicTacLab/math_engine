@@ -5,9 +5,7 @@
 
 (defn get-model-file [storage id]
   (let [{:keys [conn]} storage]
-    (some->
-     (cql/select conn "models"
-                 (columns :id :file :file_name :in_sheet_name :out_sheet_name)
-                 (where [[= :id id]]))
-     first
-     (update-in [:file] #(Bytes/getArray %)))))
+    (-> (cql/get-one conn "models"
+                     (columns :id :file :file_name :in_sheet_name :out_sheet_name)
+                     (where [[= :id id]]))
+        (update-in [:file] #(Bytes/getArray %)))))
