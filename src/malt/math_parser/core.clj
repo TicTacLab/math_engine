@@ -7,8 +7,10 @@
     [malt.utils :as utils]
     [malt.session :as session]
     [malt.storage :as storage]
-    [malt.storage.cache :as cache]
-    [malt.storage.models :as models]
+    [malt.storage
+     [cache :as cache]
+     [models :as models]
+     [in-params :as in-params]]
     [malt.response :as response]
     [flatland.protobuf.core :as pb]
     [metrics.meters :as meter])
@@ -40,6 +42,7 @@
   (meter/mark! (:calls storage))
   (when (session/fetch session-store ssid)
     (session/prolong! session-store ssid))
+  (in-params/write! storage id params)
   (cache/with-cache-by-key storage {:id id :params params}
     (if calc-profile
       (response/packet-init (utils/with-timer (calc* session-store args :calc-profile calc-profile)))
