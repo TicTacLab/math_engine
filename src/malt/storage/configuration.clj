@@ -8,17 +8,15 @@
 (defn write-config! [storage config]
   (let [{:keys [conn configuration-table]} storage]
     (cql/truncate conn configuration-table)
-    (some->> config
-             json/generate-string
-             (hash-map :config)
-             (cql/insert conn configuration-table))))
+    (->> config
+         json/generate-string
+         (hash-map :config)
+         (cql/insert conn configuration-table))))
 
 (defn read-config [storage]
   (let [{:keys [conn configuration-table]} storage]
     (try
-      (json/parse-string (some->> (cql/select conn configuration-table)
-                                  first
-                                  :config)
+      (json/parse-string (:config (cql/get-one conn configuration-table))
                          true)
       (catch Exception e
         (log/error e "occured while reading config")))))

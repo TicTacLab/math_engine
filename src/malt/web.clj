@@ -6,7 +6,6 @@
             [com.stuartsierra.component :as component]
             [clojure.tools.logging :as log]
             [clojure.tools.trace :refer (trace)]
-            [malt.web.middleware :refer (wrap-with-web)]
             [malt.storage.models :refer (get-model-file)]
             [malt.storage.calculation-log :as calc-log]
             [malt.math-parser.core :refer (calc)]
@@ -58,6 +57,10 @@
   (POST   "/model/calc/:ssid" req (calc-handler req :calc-profile true))
   (POST   "/model/calc/:ssid/binary" req (calc-handler req :calc-profile false))
   (route/not-found "<h1>Page not found!</h1>"))
+
+(defn wrap-with-web [h web]
+  (fn [req]
+    (h (assoc req :web web))))
 
 (defn app [web]
   (-> routes

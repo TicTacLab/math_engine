@@ -11,12 +11,10 @@
                             :result   (nippy/freeze value)}))
 
 (defn fetch [{conn :conn} {model-id :id params :params}]
-  (let [bs (-> (cql/select conn "cache"
-                               (columns :result)
-                               (where [[= :model_id model-id]
-                                       [= :params (nippy/freeze params)]]))
-                   (first)
-                   (:result))]
+  (let [bs (:result (cql/get-one conn "cache"
+                                 (columns :result)
+                                 (where [[= :model_id model-id]
+                                         [= :params (nippy/freeze params)]])))]
     (when bs
       (nippy/thaw (Bytes/getArray bs)))))
 
