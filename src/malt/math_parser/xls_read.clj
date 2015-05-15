@@ -1,10 +1,8 @@
 (ns malt.math-parser.xls-read
-  (:use
-;   [clojure.tools.trace]
-    [clojure.java.io :only [file input-stream]]
+  (:require
+    [clojure.java.io :refer [file input-stream]]
     [malt.math-parser.xls-types :as xtypes]
     [malt.utils :as utils])
-  (:require [taoensso.timbre.profiling :refer (p profile)])
   (:import
     (org.apache.poi.ss.usermodel WorkbookFactory)
     (java.io FileOutputStream)
