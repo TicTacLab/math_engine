@@ -146,8 +146,6 @@
                                 formula
                                 ))))
 
-;; MOMISE
-
 (def binom-inv (memoize binom-inv))
 (def poisson-distribution (memoize poisson-distribution))
 (def binomial-distribution (memoize binomial-distribution))
