@@ -51,7 +51,7 @@
 (defn parse-head [rows evaluator]
   (->> rows
        first
-       (map #(extract % evaluator))
+       (map #(xtypes/extract % evaluator))
        (map keyword)))
 
 (defn cell-with-address
@@ -83,7 +83,7 @@
 
 (defn extract-with-profile [calc-profile args]
   (if calc-profile
-    (with-timer (extract-to-hash args))
+    (utils/with-timer (extract-to-hash args))
     (extract-to-hash args)))
 
 (defn extract-eval
