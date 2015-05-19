@@ -45,7 +45,7 @@
   (let [{:keys [id ssid]} params 
         model-id (Integer. id)]
     (some->>
-     (session/create-if-not-exists (:session-store web) model-id ssid)
+     (session/create-or-prolong (:session-store web) model-id ssid)
      :params
      (map (fn [param] (-> param val first (select-keys [:type :name :code :id :value]))))
      json/generate-string)))

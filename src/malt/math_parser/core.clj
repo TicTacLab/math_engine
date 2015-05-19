@@ -20,30 +20,27 @@
   (let [evaluator (->> wb-config :wb make-formula-evaluator)]
     (assoc wb-config :evaluator evaluator)))
 
-(defn calc* [session-store
-             {id :id ssid :ssid params :params}
+(defn calc* [workbook-config
+             {id :id params :params}
              & {calc-profile :calc-profile :or {calc-profile false}}]
-  (let [workbook-config (session/create-if-not-exists session-store id ssid)]
-    (if-let [result (session/with-locked-workbook workbook-config
-                      (let [wb (->> workbook-config
-                                    (set-params params)
-                                    make-evaluator)
-                            result (extract-eval wb calc-profile)]
-                        (session/save! session-store ssid wb)
-                        result))]
-      result
-      {:type       :ERROR
-       :error_type :INPROGRESS
-       :error      (str "Workbook: " id " calculation inprogress")})))
+  (if-let [result (session/with-locked-workbook workbook-config
+                    (as-> workbook-config $
+                          (set-params params $)
+                          (make-evaluator $)
+                          (extract-eval $ calc-profile)))]
+    result
+    {:type       :ERROR
+     :error_type :INPROGRESS
+     :error      (str "Workbook: " id " calculation inprogress")}))
 
 (defn calc [{storage :storage :as session-store}
             {id :id ssid :ssid params :params :as args}
             & {calc-profile :calc-profile}]
   (meter/mark! (:calls storage))
-  (when (session/fetch session-store ssid)
-    (session/prolong! session-store ssid))
   (in-params/write! storage id params)
-  (cache/with-cache-by-key storage {:id id :params params}
-    (if calc-profile
-      (response/packet-init (utils/with-timer (calc* session-store args :calc-profile calc-profile)))
-      (response/packet-init (calc* session-store args :calc-profile calc-profile)))))
+  (let [workbook-config (session/create-or-prolong session-store id ssid)
+        rev (:rev workbook-config)]
+    (cache/with-cache-by-key storage {:id id :rev rev :params params}
+      (if calc-profile
+        (response/packet-init (utils/with-timer (calc* workbook-config args :calc-profile calc-profile)))
+        (response/packet-init (calc* workbook-config args :calc-profile calc-profile))))))

@@ -58,8 +58,7 @@
       deref
       (cache/lookup ssid)))
 
-(defn save! [session-store ssid v]
-  ;; check locking session before save, or return old state 
+(defn prolong! [session-store ssid v]
   (swap! (get session-store :session-table) assoc ssid v)
   v)
 
@@ -76,13 +75,10 @@
                                   (assoc :ssid ssid))))))
       (get ssid)))
 
-(defn create-if-not-exists [session-store id ssid]
+(defn create-or-prolong [session-store id ssid]
   (if-let [session (fetch session-store ssid)]
-    session
+    (prolong! session-store ssid session)
     (create! session-store id ssid)))
-
-(defn prolong! [session-store ssid]
-  (save! session-store ssid (fetch session-store ssid)))
 
 (defrecord SessionStore
     [session-table session-ttl storage sessions-count]
