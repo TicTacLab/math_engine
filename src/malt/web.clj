@@ -6,7 +6,7 @@
             [com.stuartsierra.component :as component]
             [clojure.tools.logging :as log]
             [clojure.tools.trace :refer (trace)]
-            [malt.storage.models :refer (get-model-file)]
+            [malt.storage.models :refer (get-model)]
             [malt.storage.calculation-log :as calc-log]
             [malt.math-parser.core :refer (calc)]
             [malt.utils :refer (string-to-double string-to-integer)]

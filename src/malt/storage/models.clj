@@ -3,9 +3,9 @@
             [clojurewerkz.cassaforte.query :refer [where columns]])
   (:import (com.datastax.driver.core.utils Bytes)))
 
-(defn get-model-file [storage id]
+(defn get-model [storage id]
   (let [{:keys [conn]} storage]
     (-> (cql/get-one conn "models"
-                     (columns :id :file :file_name :in_sheet_name :out_sheet_name)
+                     (columns :id :rev :file :file_name :in_sheet_name :out_sheet_name)
                      (where [[= :id id]]))
         (update-in [:file] #(Bytes/getArray %)))))

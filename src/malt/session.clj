@@ -16,7 +16,7 @@
            [java.util.concurrent Semaphore]))
 
 (defrecord WorkbookConfig
-  [id wb evaluator params sheets
+  [id rev wb evaluator params sheets
    in-sheet out-sheet file-name
    out-cells
    out-header
@@ -71,7 +71,7 @@
                  (assoc table ssid
                               (-> session-store
                                   :storage
-                                  (models/get-model-file id)
+                                  (models/get-model id)
                                   config-to-workbook
                                   (assoc :ssid ssid))))))
       (get ssid)))
