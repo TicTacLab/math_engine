@@ -14,7 +14,8 @@
       {:storage         (storage/new-storage (-> config
                                                  (select-keys [:storage-nodes :storage-keyspace :configuration-table
                                                                :storage-user :storage-password :cache-on])
-                                                 (assoc :storage-nodes (json/parse-string storage-nodes))))
+                                                 (assoc :storage-nodes (json/parse-string storage-nodes))
+                                                 (update-in [:cache-on] #(Boolean/valueOf %))))
        :session-store   (component/using
                           (session/new-session-store (select-keys config [:session-ttl]))
                           [:storage])
