@@ -1,14 +1,14 @@
  (ns dev
-  (:require [ns-tracker.core :refer (ns-tracker)]
-            [malt.system :as s]
-            [clojure.pprint :refer [pprint]]
-            [com.stuartsierra.component :as component]
-            [environ.core :as environ]))
+   (:require [ns-tracker.core :refer (ns-tracker)]
+             [malt.system :as s]
+             [clojure.pprint :refer [pprint]]
+             [com.stuartsierra.component :as component]
+             [malt.configurator :as conf]))
 
 (defonce system nil)
 
 (defn init []
-  (alter-var-root #'system (constantly (s/new-system environ/env))))
+  (alter-var-root #'system (constantly (s/new-system @conf/config))))
 
 (defn start []
   (alter-var-root #'system component/start))

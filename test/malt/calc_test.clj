@@ -4,11 +4,11 @@
             [malt.session :as sess]
             [clojure.test :refer :all]
             [com.stuartsierra.component :as component]
-            [environ.core :as environ]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [malt.configurator :as conf]))
 
 (deftest calc-test
-  (let [sys (component/start (s/new-system environ/env))]
+  (let [sys (component/start (s/new-system @conf/config))]
     (try
       (let [session-store (:session-store sys)
             workbook-config (sess/config-to-workbook {:file           (io/file "test/malt/test-model.xls")

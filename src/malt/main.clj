@@ -1,13 +1,26 @@
 (ns malt.main
-  (:require [environ.core :as environ]
-            [malt.system :as s]
-            [com.stuartsierra.component :as component])
+  (:require [malt.system :as s]
+            [com.stuartsierra.component :as component]
+            [malt.configurator :as conf]
+            [clojure.tools.logging :as log])
   (:gen-class))
 
-(defonce system nil)
+(defonce system (atom nil))
 
 (defn -main [& _args]
-  (alter-var-root #'system (constantly (component/start (s/new-system environ/env))))
+  (try
+    (reset! system (component/start (s/new-system @conf/config)))
+    (catch Exception e
+      (log/error e "Exception during startup. Fix configuration and
+                    start application using REST configuration interface")))
+  (conf/start (fn []
+                (swap! system
+                       (fn [s]
+                         (component/stop s)
+                         (component/start (s/new-system @conf/config))))))
   (.. Runtime
       (getRuntime)
-      (addShutdownHook (Thread. #(component/stop system)))))
+      (addShutdownHook (Thread. (fn []
+                                  (do
+                                    (component/stop @system)
+                                    (conf/stop)))))))
