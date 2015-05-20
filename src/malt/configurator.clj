@@ -9,18 +9,23 @@
             [clojure.stacktrace :as exp]))
 
 (defonce srv (atom nil))
-(defonce config (atom (select-keys environ/env
-                                   [:storage-nodes
-                                    :storage-keyspace
-                                    :storage-user
-                                    :storage-password
-                                    :configuration-table
-                                    :zabbix-host
-                                    :zabbix-port
-                                    :monitoring-hostname
-                                    :session-ttl
-                                    :cache-on
-                                    :rest-port])))
+(defonce config (atom (-> environ/env
+                          (select-keys [:storage-nodes
+                                        :storage-keyspace
+                                        :storage-user
+                                        :storage-password
+                                        :configuration-table
+                                        :zabbix-host
+                                        :zabbix-port
+                                        :monitoring-hostname
+                                        :session-ttl
+                                        :cache-on
+                                        :rest-port])
+                          (update-in [:storage-nodes] json/parse-string true)
+                          (update-in [:cache-on] #(Boolean/valueOf %))
+                          (update-in [:port] #(Integer/valueOf %))
+                          (update-in [:session-ttl] #(Integer/valueOf %))
+                          (update-in [:zabbix-port] #(Integer/valueOf %)))))
 
 (defn parse-config [req]
   (-> req
