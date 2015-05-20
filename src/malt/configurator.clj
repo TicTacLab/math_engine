@@ -23,7 +23,7 @@
                                         :rest-port])
                           (update-in [:storage-nodes] json/parse-string true)
                           (update-in [:cache-on] #(Boolean/valueOf %))
-                          (update-in [:port] #(Integer/valueOf %))
+                          (update-in [:rest-port] #(Integer/valueOf %))
                           (update-in [:session-ttl] #(Integer/valueOf %))
                           (update-in [:zabbix-port] #(Integer/valueOf %)))))
 
