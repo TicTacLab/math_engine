@@ -5,7 +5,8 @@
     [clojure.string :refer (split)]
     [malt.session :as session]
     [malt.storage :as storage]
-    [malt.web :as w]))
+    [malt.web :as w]
+    [cheshire.core :as json]))
 
 (defn new-system [config]
   (let [{:keys [rest-port monitoring-hostname zabbix-host zabbix-port storage-nodes]} config]
@@ -13,8 +14,7 @@
       {:storage         (storage/new-storage (-> config
                                                  (select-keys [:storage-nodes :storage-keyspace :configuration-table
                                                                :storage-user :storage-password :cache-on])
-                                                 (assoc :storage-nodes (binding [*read-eval* false]
-                                                                         (read-string storage-nodes)))))
+                                                 (assoc :storage-nodes (json/parse-string storage-nodes))))
        :session-store   (component/using
                           (session/new-session-store (select-keys config [:session-ttl]))
                           [:storage])
