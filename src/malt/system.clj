@@ -8,11 +8,13 @@
     [malt.web :as w]))
 
 (defn new-system [config]
-  (let [{:keys [rest-port monitoring-hostname zabbix-host zabbix-port]} config]
+  (let [{:keys [rest-port monitoring-hostname zabbix-host zabbix-port storage-nodes]} config]
     (component/map->SystemMap
-      {:storage         (storage/new-storage (select-keys config
-                                                          [:storage-nodes :storage-keyspace :configuration-table
-                                                           :storage-user :storage-password :cache-on]))
+      {:storage         (storage/new-storage (-> config
+                                                 (select-keys [:storage-nodes :storage-keyspace :configuration-table
+                                                               :storage-user :storage-password :cache-on])
+                                                 (assoc :storage-nodes (binding [*read-eval* false]
+                                                                         (read-string storage-nodes)))))
        :session-store   (component/using
                           (session/new-session-store (select-keys config [:session-ttl]))
                           [:storage])
