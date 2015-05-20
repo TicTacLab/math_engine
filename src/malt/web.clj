@@ -6,7 +6,7 @@
             [com.stuartsierra.component :as component]
             [clojure.tools.logging :as log]
             [clojure.tools.trace :refer (trace)]
-            [malt.storage.models :refer (get-model-file)]
+            [malt.storage.models :refer (get-model)]
             [malt.storage.calculation-log :as calc-log]
             [malt.math-parser.core :refer (calc)]
             [malt.utils :refer (string-to-double string-to-integer)]
@@ -45,7 +45,7 @@
   (let [{:keys [id ssid]} params 
         model-id (Integer. id)]
     (some->>
-     (session/create-if-not-exists (:session-store web) model-id ssid)
+     (session/create-or-prolong (:session-store web) model-id ssid)
      :params
      (map (fn [param] (-> param val first (select-keys [:type :name :code :id :value]))))
      json/generate-string)))
