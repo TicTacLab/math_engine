@@ -47,12 +47,10 @@
             [lein-protobuf "0.4.1"]
             [lein-environ "1.0.0"]]
 
-  :profiles {:dev  [:dev-env
-                    {:source-paths ["dev"]
-                     :dependencies [[ns-tracker "0.2.2"]
-                                    [aprint "0.1.0"]
-                                    [http-kit.fake "0.2.1"]
-                                    [http-kit "2.1.16"]
-                                    [criterium "0.4.3"]]}]
-             :test [:test-env]}
+  :profiles {:dev  {:source-paths ["dev"]
+                    :dependencies [[ns-tracker "0.2.2"]
+                                   [aprint "0.1.0"]
+                                   [http-kit.fake "0.2.1"]
+                                   [http-kit "2.1.16"]
+                                   [criterium "0.4.3"]]}}
   :main malt.main)

@@ -9,7 +9,7 @@
 
 (defn -main [& _args]
   (try
-    (reset! system (component/start (s/new-system @conf/config)))
+    (swap! system #(if % % (component/start (s/new-system @conf/config))))
     (catch Exception e
       (log/error e "Exception during startup. Fix configuration and
                     start application using REST configuration interface")))

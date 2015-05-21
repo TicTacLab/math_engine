@@ -5,31 +5,12 @@
             [cheshire.core :as json]
             [ring.util.request :as req]
             [clojure.tools.trace :refer [trace]]
-            [environ.core :as environ]
             [clojure.stacktrace :as exp]
             [dire.core :refer [with-handler!]])
   (:import [com.fasterxml.jackson.core JsonParseException]))
 
 (defonce srv (atom nil))
-(defonce config (atom (-> environ/env
-                          (select-keys [:storage-nodes
-                                        :storage-keyspace
-                                        :storage-user
-                                        :storage-password
-                                        :configuration-table
-                                        :zabbix-host
-                                        :zabbix-port
-                                        :monitoring-hostname
-                                        :session-ttl
-                                        :cache-on
-                                        :rest-port])
-                          (update-in [:storage-nodes] #(if (sequential? %)
-                                                        %
-                                                        (json/parse-string % true)))
-                          (update-in [:cache-on] #(Boolean/valueOf %))
-                          (update-in [:rest-port] #(Integer/valueOf %))
-                          (update-in [:session-ttl] #(Integer/valueOf %))
-                          (update-in [:zabbix-port] #(Integer/valueOf %)))))
+(def config (atom (json/parse-string (slurp "config.json") true)))
 
 (defn json-response
   "Takes map, returns ring response with body as map in json
