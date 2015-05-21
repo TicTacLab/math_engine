@@ -1,7 +1,5 @@
 {
     "cache-on": false,
-    "configuration-table": "configuration",
-    "monitoring-hostname": "dc01m01.favorit",
     "rest-port": 3000,
     "session-ttl": 900,
     "storage-keyspace": "malt",
@@ -12,6 +10,7 @@
     ],
     "storage-password": "CacNeck5",
     "storage-user": "malt",
+    "monitoring-hostname": "dc01m01.favorit",
     "zabbix-host": "192.168.167.2",
     "zabbix-port": 10051
 }

@@ -97,9 +97,11 @@
       :session-table nil
       :sessions-count nil)))
 
-(def SessionStoreConfig
+(def SessionStoreSchema
   {:session-ttl s/Int})
 
 (defn new-session-store [m]
-  (when (s/validate SessionStoreConfig m)
-    (map->SessionStore m)))
+  (as-> m $
+        (select-keys $ (keys SessionStoreSchema))
+        (s/validate SessionStoreSchema $)
+        (map->SessionStore $)))

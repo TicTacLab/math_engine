@@ -89,5 +89,8 @@
    :host s/Str})
 
 (defn new-web [m]
-  (s/validate WebSchema m)
-  (map->Web m))
+  (as-> m $
+        (merge $ {:rest-host "0.0.0.0"})
+        (select-keys $ (keys WebSchema))
+        (s/validate WebSchema $)
+        (map->Web $)))

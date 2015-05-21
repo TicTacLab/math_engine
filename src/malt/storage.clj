@@ -14,7 +14,6 @@
                     storage-keyspace
                     storage-user
                     storage-password
-                    configuration-table
                     cache-hit
                     hits
                     calls
@@ -53,13 +52,14 @@
 
 
 (def StorageSchema
-  {:storage-nodes             [s/Str]
-   :storage-keyspace          s/Str
-   :storage-user              s/Str
-   :storage-password          s/Str
-   :configuration-table       s/Str
-   (s/optional-key :cache-on) (s/maybe s/Bool)})
+  {:storage-nodes    [s/Str]
+   :storage-keyspace s/Str
+   :storage-user     s/Str
+   :storage-password s/Str
+   :cache-on         s/Bool})
 
 (defn new-storage [m]
-  (s/validate StorageSchema m)
-  (map->Storage m))
+  (as-> m $
+        (select-keys $ (keys StorageSchema))
+        (s/validate StorageSchema $)
+        (map->Storage $)))

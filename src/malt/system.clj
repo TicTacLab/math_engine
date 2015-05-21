@@ -5,19 +5,17 @@
     [clojure.string :refer (split)]
     [malt.session :as session]
     [malt.storage :as storage]
-    [malt.web :as w]
-    [cheshire.core :as json]))
+    [malt.web :as w]))
 
 (defn new-system [config]
-  (let [{:keys [rest-port monitoring-hostname zabbix-host zabbix-port storage-nodes session-ttl]} config]
+  (let [{:keys [monitoring-hostname zabbix-host zabbix-port]} config]
     (component/map->SystemMap
-      {:storage         (storage/new-storage (select-keys config [:storage-nodes :storage-keyspace :configuration-table
-                                                                  :storage-user :storage-password :cache-on]))
+      {:storage         (storage/new-storage config)
        :session-store   (component/using
-                          (session/new-session-store {:session-ttl session-ttl})
+                          (session/new-session-store config)
                           [:storage])
        :web             (component/using
-                          (w/new-web {:host "0.0.0.0" :port rest-port})
+                          (w/new-web config)
                           [:storage :session-store])
        :zabbix-reporter (zabbix/new-zabbix-reporter
                           {:hostname         monitoring-hostname
