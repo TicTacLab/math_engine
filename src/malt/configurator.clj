@@ -7,7 +7,8 @@
             [clojure.tools.trace :refer [trace]]
             [environ.core :as environ]
             [clojure.stacktrace :as exp]
-            [criterium.core :refer [bench]]))
+            [dire.core :refer [with-handler!]])
+  (:import [com.fasterxml.jackson.core JsonParseException]))
 
 (defonce srv (atom nil))
 (defonce config (atom (-> environ/env
@@ -30,34 +31,47 @@
                           (update-in [:session-ttl] #(Integer/valueOf %))
                           (update-in [:zabbix-port] #(Integer/valueOf %)))))
 
-(defn parse-config [req]
-  (-> req
-      (req/body-string)
-      (json/parse-string true)))
-
-(defn ok-response [config]
-  (-> config
+(defn json-response
+  "Takes map, returns ring response with body as map in json
+   and response type set to application/json."
+  [m]
+  (-> m
       (json/generate-string)
       (res/response)
       (res/content-type "application/json")))
 
 (defn read-config []
-  (ok-response @config))
+  (-> @config
+      (json-response)
+      (res/status 200)))
 
 (defn update-config [req]
   (as-> req $
-        (parse-config $)
+        (req/body-string $)
+        (json/parse-string $ true)
         (swap! config merge $)
-        (ok-response $)))
+        (json-response $)
+        (res/status $ 200)))
+
+(with-handler! #'update-config
+  JsonParseException
+  (fn [e _]
+    (-> {:_error (.getMessage e)}
+        (json-response)
+        (res/status 400))))
 
 (defn restart-system [restart-fn]
-  (try
-    (restart-fn)
-    (res/status {} 200)
-    (catch Exception e
-      (-> (res/response (with-out-str
-                          (exp/print-stack-trace e)))
-          (res/status 500)))))
+  (restart-fn)
+  (-> {:_restarted :ok}
+      (json-response)
+      (res/status 200)))
+
+(with-handler! #'restart-system
+  Exception
+  (fn [e _]
+    (-> {:_error (.getMessage (exp/root-cause e))}
+        (json-response)
+        (res/status 500))))
 
 (defn handler [restart-fn]
   (routes

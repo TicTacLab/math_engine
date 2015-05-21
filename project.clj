@@ -27,6 +27,7 @@
                  [javax.servlet/javax.servlet-api "3.1.0"]
                  [compojure "1.2.0"]
                  [ring "1.3.2"]
+                 [dire "0.5.3"]
                  [org.clojure/core.cache "0.6.4"]]
 
   :source-paths ["src"]
