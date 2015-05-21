@@ -6,7 +6,8 @@
             [ring.util.request :as req]
             [clojure.tools.trace :refer [trace]]
             [environ.core :as environ]
-            [clojure.stacktrace :as exp]))
+            [clojure.stacktrace :as exp]
+            [criterium.core :refer [bench]]))
 
 (defonce srv (atom nil))
 (defonce config (atom (-> environ/env
@@ -21,7 +22,9 @@
                                         :session-ttl
                                         :cache-on
                                         :rest-port])
-                          (update-in [:storage-nodes] json/parse-string true)
+                          (update-in [:storage-nodes] #(if (sequential? %)
+                                                        %
+                                                        (json/parse-string % true)))
                           (update-in [:cache-on] #(Boolean/valueOf %))
                           (update-in [:rest-port] #(Integer/valueOf %))
                           (update-in [:session-ttl] #(Integer/valueOf %))
