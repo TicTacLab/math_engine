@@ -2,7 +2,7 @@
   :description "REST FOR CAST EXCEL"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.betinvest/poi "3.11-20150430"]
-                 [com.betinvest/noilly "0.1.1"]
+                 [com.betinvest/noilly "0.1.2"]
                  [org.apache.poi/poi-ooxml "3.11" :exclusions [org.apache.poi/poi]]
                  [org.apache.poi/poi-ooxml-schemas "3.11" :exclusions [org.apache.poi/poi]]
                  [commons-codec/commons-codec "1.9"]
