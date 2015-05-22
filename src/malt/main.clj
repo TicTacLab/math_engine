@@ -1,5 +1,6 @@
 (ns malt.main
   (:require [malt.system :as s]
+            [malt.config :as c]
             [com.stuartsierra.component :as component]
             [clojure.tools.logging :as log]
             [noilly.core :as noilly])
@@ -10,7 +11,7 @@
 
 (defn -main [& _args]
   (try
-    (swap! system #(if % % (component/start (s/new-system @s/config))))
+    (swap! system #(if % % (component/start (s/new-system @c/config))))
     (catch Exception e
       (log/error e "Exception during startup. Fix configuration and
                     start application using REST configuration interface")))
@@ -18,11 +19,11 @@
          (fn [srv]
            (if srv
              srv
-             (noilly/start s/config
+             (noilly/start c/config
                            #(swap! system
                                    (fn [s]
                                      (component/stop s)
-                                     (component/start (s/new-system @s/config))))))))
+                                     (component/start (s/new-system @c/config))))))))
   (.. Runtime
       (getRuntime)
       (addShutdownHook (Thread. (fn []

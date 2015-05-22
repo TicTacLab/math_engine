@@ -5,10 +5,7 @@
     [clojure.string :refer (split)]
     [malt.session :as session]
     [malt.storage :as storage]
-    [malt.web :as w]
-    [cheshire.core :as json]))
-
-(def config (atom (json/parse-string (slurp "config.json") true)))
+    [malt.web :as w]))
 
 (defn new-system [config]
   (let [{:keys [monitoring-hostname zabbix-host zabbix-port]} config]
