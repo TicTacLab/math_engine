@@ -2,8 +2,7 @@
    (:require [ns-tracker.core :refer (ns-tracker)]
              [malt.system :as s]
              [clojure.pprint :refer [pprint]]
-             [com.stuartsierra.component :as component]
-             [malt.configurator :as conf]))
+             [com.stuartsierra.component :as component]))
 
 (defonce system nil)
 
