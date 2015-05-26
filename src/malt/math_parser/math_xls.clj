@@ -146,9 +146,9 @@
                                 formula
                                 ))))
 
-(def binom-inv (memoize binom-inv))
+#_(def binom-inv (memoize binom-inv))
 (def poisson-distribution (memoize poisson-distribution))
-(def binomial-distribution (memoize binomial-distribution))
-(def pascal-distribution (memoize pascal-distribution))
-(def normal-distribution (memoize normal-distribution))
+#_(def binomial-distribution (memoize binomial-distribution))
+#_(def pascal-distribution (memoize pascal-distribution))
+#_(def normal-distribution (memoize normal-distribution))
 
