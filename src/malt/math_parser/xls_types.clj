@@ -12,10 +12,10 @@
         )
   (:import
    (org.apache.poi.ss.formula.udf AggregatingUDFFinder DefaultUDFFinder)
-   (org.apache.poi.ss.formula.functions Fixed4ArgFunction Fixed3ArgFunction FreeRefFunction)
+   (org.apache.poi.ss.formula.functions Fixed4ArgFunction Fixed3ArgFunction FreeRefFunction Function)
    (org.apache.poi.ss.formula WorkbookEvaluator)
    (org.apache.poi.ss.formula.eval NumberEval BoolEval RefEvalBase ErrorEval StringEval OperandResolver)
-   (org.apache.poi.ss.usermodel Cell CellValue)
+   (org.apache.poi.ss.usermodel Cell CellValue FormulaEvaluator)
    (org.apache.poi.hssf.usermodel HSSFCell HSSFRow HSSFSheet)
    (org.apache.poi.xssf.usermodel XSSFCell XSSFRow XSSFSheet)))
 
@@ -34,7 +34,7 @@
     7  "DIV/0"
     (str "formula error:" code )))
 
-(defn formula-eval-error [cell]
+(defn formula-eval-error [^Cell cell]
   (str " cant eval formula:" (.getCellFormula cell)
        " sheet:" (.. cell getSheet getSheetName)
        " row:" (.getRowIndex cell)
@@ -43,13 +43,13 @@
 
 (defn formula-eval
   "eval excel formulas"
-  ([cell]
+  ([^Cell cell]
    (formula-eval cell (-> cell
                           (.getSheet)
                           (.getWorkbook)
                           (.getCreationHelper)
                           (.createFormulaEvaluator))))
-  ([cell evaluator]
+  ([^Cell cell ^FormulaEvaluator evaluator]
    (try
      (.evaluate evaluator cell)
      (catch Exception e
@@ -123,7 +123,7 @@
           Cell/CELL_TYPE_BLANK      nil
           (logger/error 
            (str "undef cell type: " (.getCellType this))))))
-   (pack [this value] (->> (pack value) (.setCellValue this)))
+   (pack [this value] (.setCellValue this (pack value)))
 
    XSSFCell
    (isFormula? [this]
@@ -193,7 +193,7 @@
    (pack [this] this)
    (extract [this] this))
 
-(defn register-fun! [nm fun]
+(defn register-fun! [^String nm ^Function fun]
   (WorkbookEvaluator/registerFunction nm fun))
 
 ;;; NORMDIST impementation fun
@@ -208,7 +208,7 @@
             ]
 ;		(println [standard_dev-value x-value mean-value])
 		(if (every? #(or (integer? %) (float? %)) [standard_dev-value x-value mean-value])
-		  (NumberEval. (normal-distribution x-value mean-value standard_dev-value cumulative-value))
+		  (NumberEval. ^double (normal-distribution x-value mean-value standard_dev-value cumulative-value))
 		  (StringEval. (str [x-value mean-value standard_dev-value]))
 		  )))))
 
@@ -228,7 +228,7 @@
             mean-value (extract mean)]
         (if (and (number? x-value) (>= x-value 0)
                  (number? mean-value) (> mean-value 0))
-          (NumberEval. (poisson-distribution x-value mean-value cumulative-value))
+          (NumberEval. ^double (poisson-distribution x-value mean-value cumulative-value))
           (StringEval. "VALUE!"))))))
 
 (register-fun! "POISSON" poisson)
@@ -245,7 +245,7 @@
             standard_dev (extract-operand args 2 row col)
             cumulative (extract-operand args 3 row col)]
         (if (every? #(or (integer? %) (float? %)) [standard_dev x mean])
-          (NumberEval. (normal-distribution x mean standard_dev cumulative))
+          (NumberEval. ^double (normal-distribution x mean standard_dev cumulative))
           (StringEval. "VALUE!"))))))
 
 (def normdist-udf (AggregatingUDFFinder.  (into-array [(DefaultUDFFinder. (into-array ["_xlfn.NORM.DIST"])  (into-array [normdist-free]))])))
@@ -263,7 +263,7 @@
             cumulative (extract-operand args 3 row col)
             ]
 		(if (every? #(or (integer? %) (float? %)) [number_f number_s probability_s])
-          (NumberEval. (pascal-distribution number_f number_s probability_s cumulative))
+          (NumberEval. ^double (pascal-distribution number_f number_s probability_s cumulative))
           (StringEval. "VALUE!"))))))
 
 (def pascal-udf (AggregatingUDFFinder.  (into-array [(DefaultUDFFinder. (into-array ["_xlfn.NEGBINOM.DIST"])  (into-array [pascal-distribution-free]))])))
@@ -281,7 +281,7 @@
             cumulative (extract-operand args 3 row col)
             ]
 		(if (every? #(or (integer? %) (float? %)) [number_s probability_s trials])
-          (NumberEval. (binomial-distribution number_s trials probability_s cumulative))
+          (NumberEval. ^double (binomial-distribution number_s trials probability_s cumulative))
           (StringEval. "VALUE!"))))))
 
 (def binomial-udf (AggregatingUDFFinder.

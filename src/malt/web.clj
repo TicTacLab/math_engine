@@ -18,7 +18,8 @@
             [cheshire.core :as json]
             [clojure.pprint :refer (pprint)]
             [malt.session :as session]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io])
+  (:import (org.eclipse.jetty.server Server)))
 
 (defn param-to-value [{:keys [id value]}]
   {:value (try (string-to-double value)
@@ -43,7 +44,7 @@
 (defn models-in-params-handler [{web :web
                                  params :params :as req}]
   (let [{:keys [id ssid]} params 
-        model-id (Integer. id)]
+        model-id (Integer/valueOf ^String id)]
     (some->>
      (session/create-or-prolong (:session-store web) model-id ssid)
      :params
@@ -80,7 +81,7 @@
 
   (stop [component]
     (when server
-      (.stop server)
+      (.stop ^Server server)
       (log/info "Web service stopped"))
     (assoc component :server nil)))
 

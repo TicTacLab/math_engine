@@ -4,8 +4,8 @@
     [malt.math-parser.xls-types :as xtypes]
     [malt.utils :as utils])
   (:import
-    (org.apache.poi.ss.usermodel WorkbookFactory)
-    (java.io FileOutputStream)
+    (org.apache.poi.ss.usermodel WorkbookFactory Workbook Cell Sheet Row)
+    (java.io FileOutputStream InputStream)
     (org.apache.poi.ss.util CellReference)
     [org.apache.poi.xssf.usermodel XSSFCell]))
 
@@ -15,24 +15,24 @@
            xtypes/binom-inv-udf
            ])
 
-(defn udfs-add [wb udfs]
+(defn udfs-add [^Workbook wb udfs]
   (.addToolPack wb udfs))
 
 (defn udfs-wb [wb]
   (doseq  [f udfs] (udfs-add wb f)))
 
-(defn make-formula-evaluator [wb]
+(defn make-formula-evaluator [^Workbook wb]
   (udfs-wb wb)
   (.. wb getCreationHelper createFormulaEvaluator))
 
 (defn workbook
   "Create or open new excel workbook. Defaults to xlsx format."
-  [input]
+  [^InputStream input]
   (WorkbookFactory/create input))
 
 (defn sheets
   "Get seq of sheets."
-  [wb] (map #(.getSheetAt wb %1) (range 0 (.getNumberOfSheets wb))))
+  [^Workbook wb] (map #(.getSheetAt wb %1) (range 0 (.getNumberOfSheets wb))))
 
 (defn rows
   "Return rows from sheet as seq.  Simple seq cast via Iterable implementation."
@@ -43,7 +43,7 @@
   [row] (seq row))
 
 (defn get-address
-  [cell]
+  [^Cell cell]
   {:row (.getRowIndex cell) :col (.getColumnIndex cell)})
 
 ;; params
@@ -104,24 +104,24 @@
   (with-open [in (input-stream bytes)]
     (workbook in)))
 
-(defn write-workbook [wb file-name]
+(defn write-workbook [^Workbook wb ^String file-name]
   (with-open [out (FileOutputStream. file-name)]
     (.write wb out)))
 
-(defn blank-row? [row]
+(defn blank-row? [^Row row]
   (->> (iterator-seq (.cellIterator row))
-       (map #(.getCellType %))
+       (map #(.getCellType ^Cell %))
        (every? #(= XSSFCell/CELL_TYPE_BLANK %))))
 
 (defn map-workbook
   "Lazy workbook report."
   [wb]
-  (zipmap (map #(.getSheetName %) (sheets wb)) (sheets wb)))
+  (zipmap (map #(.getSheetName ^Sheet %) (sheets wb)) (sheets wb)))
 
 (defn get-cell
   "Sell cell within row"
-  ([row col] (.getCell row col))
-  ([sheet row col] (get-cell (or (.getRow sheet row) (.createRow sheet row)) col)))
+  ([^Row row col] (.getCell row col))
+  ([^Sheet sheet row col] (get-cell (or (.getRow sheet row) (.createRow sheet row)) col)))
 
 (defn set-cell
   "set cell value"

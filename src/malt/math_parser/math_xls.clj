@@ -56,36 +56,36 @@
   (fn [x mean standard_dev cumulative]
     (true? cumulative)))
 (defmethod normal-distribution true  [x mean standard_dev cumulative]
-  (-> (->MathNormalDistributionCDF x mean standard_dev) .udf-calc))
+  (-> (->MathNormalDistributionCDF x mean standard_dev) udf-calc))
 (defmethod normal-distribution false [x mean standard_dev cumulative]
-  (-> (->MathNormalDistributionPDF x mean standard_dev) .udf-calc))
+  (-> (->MathNormalDistributionPDF x mean standard_dev) udf-calc))
 
 (defmulti pascal-distribution
   "function for calc normal distribution with PDF or CDF versions"
   (fn [number_f number_s probability_s cumulative] 
     (true? cumulative)))
 (defmethod pascal-distribution true  [number_f number_s probability_s cumulative]
-  (-> (->MathPascalDistributionCDF number_f number_s probability_s) .udf-calc))
+  (-> (->MathPascalDistributionCDF number_f number_s probability_s) udf-calc))
 (defmethod pascal-distribution false [number_f number_s probability_s cumulative]
-  (-> (->MathPascalDistributionPDF number_f number_s probability_s) .udf-calc))
+  (-> (->MathPascalDistributionPDF number_f number_s probability_s) udf-calc))
 
 (defmulti poisson-distribution
   "function for calc Binomial distribution with PDF or CDF versions"
   (fn [x mean  cumulative]
     (true? cumulative)))
 (defmethod poisson-distribution true  [x mean cumulative]
-  (-> (->PoissonDistributionCDF x mean) .udf-calc))
+  (-> (->PoissonDistributionCDF x mean) udf-calc))
 (defmethod poisson-distribution false [x mean cumulative]
-  (-> (->PoissonDistributionPDF x mean) .udf-calc))
+  (-> (->PoissonDistributionPDF x mean) udf-calc))
 
 (defmulti binomial-distribution
   "function for calc Binominal distribution with PDF or CDF versions"
   (fn [number_s trials probability_s cumulative]
     (true? cumulative)))
 (defmethod binomial-distribution true  [number_s trials probability_s cumulative]
-  (-> (->BinomialDistributionCDF number_s trials probability_s) .udf-calc))
+  (-> (->BinomialDistributionCDF number_s trials probability_s) udf-calc))
 (defmethod binomial-distribution false [number_s trials probability_s cumulative]
-  (-> (->BinomialDistributionPDF number_s trials probability_s) .udf-calc))
+  (-> (->BinomialDistributionPDF number_s trials probability_s) udf-calc))
 
 
 ;; CRITBINOM/BINOM.INV funcs

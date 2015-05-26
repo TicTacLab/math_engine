@@ -20,5 +20,5 @@
        :zabbix-reporter (zabbix/new-zabbix-reporter
                           {:hostname         monitoring-hostname
                            :zabbix-host      zabbix-host
-                           :zabbix-port      (Integer/valueOf zabbix-port)
+                           :zabbix-port      zabbix-port
                            :interval-minutes 1})})))

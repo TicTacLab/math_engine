@@ -48,10 +48,10 @@
                            :out-header header))))
 
 (defmacro with-locked-workbook [workbook-config & body]
-  `(when (.tryAcquire (:lock ~workbook-config))
+  `(when (.tryAcquire ^Semaphore (:lock ~workbook-config))
      (try
        ~@body
-       (finally (.release (:lock ~workbook-config))))))
+       (finally (.release ^Semaphore (:lock ~workbook-config))))))
 
 (defn fetch [session-store ssid]
   (-> (get session-store :session-table)

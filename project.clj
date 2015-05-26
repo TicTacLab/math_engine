@@ -46,6 +46,7 @@
             [lein-environ "1.0.0"]]
 
   :profiles {:dev  {:source-paths ["dev"]
+                    :global-vars {*warn-on-reflection* true}
                     :dependencies [[ns-tracker "0.2.2"]
                                    [aprint "0.1.0"]
                                    [http-kit.fake "0.2.1"]

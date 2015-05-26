@@ -2,12 +2,13 @@
    (:require [ns-tracker.core :refer (ns-tracker)]
              [malt.system :as s]
              [clojure.pprint :refer [pprint]]
-             [com.stuartsierra.component :as component]))
+             [com.stuartsierra.component :as component]
+             [malt.config :as c]))
 
 (defonce system nil)
 
 (defn init []
-  (alter-var-root #'system (constantly (s/new-system @s/config))))
+  (alter-var-root #'system (constantly (s/new-system @c/config))))
 
 (defn start []
   (alter-var-root #'system component/start))
