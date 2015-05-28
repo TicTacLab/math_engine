@@ -310,7 +310,9 @@
 
 (def sum-free
   (proxy [AggregateFunction] []
-         (evaluate [args] (reduce + args))
+         (evaluate [args]
+           (areduce ^doubles args i acc 0.0
+                    (unchecked-add acc (aget ^doubles args i))))
          (getMaxNumOperands [] 255)))
 
 (register-fun! "SUM" sum-free)
