@@ -138,7 +138,7 @@
                                                       (str "NORMDIST" fn-body))))
 
 (defn sum-replace-long [formula]
-   (function-name-test "SUM" formula
+  (function-name-test "SUM" formula
                             (let [args (clojure.string/split formula #",")]
                               (trace (count args))
                               (if (< SUM-ARGS-MAX (count args))

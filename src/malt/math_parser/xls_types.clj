@@ -12,20 +12,18 @@
         )
   (:import
    (org.apache.poi.ss.formula.udf AggregatingUDFFinder DefaultUDFFinder)
-   (org.apache.poi.ss.formula.functions Fixed4ArgFunction Fixed3ArgFunction FreeRefFunction Function)
+   (org.apache.poi.ss.formula.functions Fixed4ArgFunction Fixed3ArgFunction FreeRefFunction Function AggregateFunction)
    (org.apache.poi.ss.formula WorkbookEvaluator)
    (org.apache.poi.ss.formula.eval NumberEval BoolEval RefEvalBase ErrorEval StringEval OperandResolver)
    (org.apache.poi.ss.usermodel Cell CellValue FormulaEvaluator)
    (org.apache.poi.hssf.usermodel HSSFCell HSSFRow HSSFSheet)
    (org.apache.poi.xssf.usermodel XSSFCell XSSFRow XSSFSheet)))
 
-(defprotocol CastClass
+(defprotocol CastClass                                                                       ;;
   (extract [this] [this value] "calc formulas and extract data from cells")
   (pack [this] [this value])
   (toString [this])
-  (toMap [this] )
-  (formulaScan [this] "scan formulas and replace to correct version")
-  (isFormula? [this] "boolean predicat for formula type of cell"))
+  (formulaScan [this] "scan formulas and replace to correct version"))
 
 
 (defn error-code [code]
@@ -94,15 +92,8 @@
      ([this evaluator] (map #(extract % evaluator) (seq this))))
    
    HSSFCell
-   (isFormula? [this]
-     (= Cell/CELL_TYPE_FORMULA (.getCellType this)))
 
-   (formulaScan [this]
-     (if  (isFormula? this)
-       (.setCellFormula this (poissson-replace-bool-int (.getCellFormula this)))
-       this))
-   
-   (extract
+  (extract
      ([this]
         (condp = (.getCellType this)
           Cell/CELL_TYPE_FORMULA    (extract (formula-eval this))
@@ -126,17 +117,8 @@
    (pack [this value] (.setCellValue this (pack value)))
 
    XSSFCell
-   (isFormula? [this]
-     (= Cell/CELL_TYPE_FORMULA (.getCellType this)))
-   
-   (formulaScan [this]
-     (if  (isFormula? this)
-           (.setCellFormula this (sum-replace-long (.getCellFormula this)))
-;           (.setCellFormula this (poissson-replace-bool-int (.getCellFormula this)))
-           this))
 
-   
-   (extract
+  (extract
      ([this]
         (condp = (.getCellType this)
           Cell/CELL_TYPE_FORMULA    (extract (formula-eval this))
@@ -325,3 +307,10 @@
           (StringEval. "VALUE!"))))))
 
 (register-fun! "CRITBINOM" critbinom-free)
+
+(def sum-free
+  (proxy [AggregateFunction] []
+         (evaluate [args] (reduce + args))
+         (getMaxNumOperands [] 255)))
+
+(register-fun! "SUM" sum-free)
