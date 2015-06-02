@@ -32,7 +32,7 @@
   (let [args (-> req
                  req/body-string
                  (json/parse-string true)
-                 (update-in [:id] #(Integer/valueOf %))
+                 (update-in [:id] string-to-integer)
                  (update-in [:params] #(mapv param-to-value %))
                  (assoc :ssid ssid))
         result (or (calc session-store args :calc-profile calc-profile)
