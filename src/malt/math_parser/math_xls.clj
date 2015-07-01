@@ -1,10 +1,11 @@
 (ns malt.math-parser.math-xls
-  (:use    [clojure.tools.trace])
+  (:use [clojure.tools.trace])
+  (:require [clojure.core.cache :as cache])
   (:import (org.apache.commons.math3.distribution
-            NormalDistribution
-            PascalDistribution
-            PoissonDistribution
-            BinomialDistribution)))
+             NormalDistribution
+             PascalDistribution
+             PoissonDistribution
+             BinomialDistribution)))
 
 (def SUM-ARGS-MAX 29)
 
@@ -146,9 +147,19 @@
                                 formula
                                 ))))
 
-#_(def binom-inv (memoize binom-inv))
-(def poisson-distribution (memoize poisson-distribution))
-#_(def binomial-distribution (memoize binomial-distribution))
-#_(def pascal-distribution (memoize pascal-distribution))
-#_(def normal-distribution (memoize normal-distribution))
+(defn lu-memoize [f]
+  (let [lu (atom (cache/lu-cache-factory {} :threshold 1000))]
+    (fn [& args]
+      (if (cache/has? @lu args)
+        (do
+          (cache/hit @lu args)
+          (cache/lookup @lu args))
+        (let [result (apply f args)]
+          (cache/miss @lu args result)
+          result)))))
+#_(def binom-inv (lu-memoize binom-inv))
+#_(def poisson-distribution (lu-memoize poisson-distribution*))
+#_(def binomial-distribution (lu-memoize binomial-distribution))
+#_(def pascal-distribution (lu-memoize pascal-distribution))
+#_(def normal-distribution (lu-memoize normal-distribution))
 
