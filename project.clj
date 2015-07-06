@@ -1,6 +1,7 @@
 (defproject malt "1.0.0-SNAPSHOT"
   :description "REST FOR CAST EXCEL"
   :dependencies [[org.clojure/clojure "1.6.0"]
+                 [malcolmx "0.1.0-SNAPSHOT"]
                  [com.betinvest/poi "3.11-20150430"]
                  [com.betinvest/noilly "0.1.4"]
                  [org.apache.poi/poi-ooxml "3.11" :exclusions [org.apache.poi/poi]]
@@ -51,5 +52,18 @@
                                    [aprint "0.1.0"]
                                    [http-kit.fake "0.2.1"]
                                    [http-kit "2.1.16"]
-                                   [criterium "0.4.3"]]}}
+                                   [criterium "0.4.3"]
+                                   [im.chit/vinyasa "0.3.4"]
+                                   [org.clojure/tools.trace "0.7.8"]]
+
+                    :injections [(require '[vinyasa.inject :as inject])
+                                 (require 'aprint.core)
+                                 (require 'clojure.pprint)
+                                 (require 'clojure.tools.trace)
+                                 (require 'criterium.core)
+                                 (inject/in clojure.core >
+                                            [aprint.core aprint]
+                                            [clojure.pprint pprint]
+                                            [clojure.tools.trace trace]
+                                            [criterium.core bench])]}}
   :main malt.main)
