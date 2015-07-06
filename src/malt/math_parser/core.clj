@@ -36,10 +36,10 @@
 
 (defn calc [{storage :storage :as session-store}
             {id :id ssid :ssid params :params :as args}
-            & {calc-profile :calc-profile}]
+            & {profile? :profile?}]
   (meter/mark! (:calls storage))
   (in-params/write! storage id params)
   (let [workbook-config (session/create-or-prolong session-store id ssid)
         rev (:rev workbook-config)]
     (cache/with-cache-by-key storage {:id id :rev rev :params params}
-      (response/packet-init (calc* workbook-config args :profile? calc-profile)))))
+      (response/packet-init (calc* workbook-config args :profile? profile?)))))
