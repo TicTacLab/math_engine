@@ -1,8 +1,6 @@
 (ns malt.math-parser.core
   (:require
     [clojure.tools.logging :as logger :only (info error)]
-    [clojure.tools.trace :refer (trace)]
-    [malt.math-parser.xls-read :refer (make-formula-evaluator extract-eval)]
     [malt.math-parser.params :refer [set-params]]
     [malt.utils :as utils]
     [malt.session :as session]
@@ -12,26 +10,29 @@
      [models :as models]
      [in-params :as in-params]]
     [malt.response :as response]
-    [flatland.protobuf.core :as pb]
-    [metrics.meters :as meter])
-  (:import [malt.session WorkbookConfig]))
-
-(defn #^WorkbookConfig make-evaluator [#^WorkbookConfig wb-config]
-  (let [evaluator (->> wb-config :wb make-formula-evaluator)]
-    (assoc wb-config :evaluator evaluator)))
+    [metrics.meters :as meter]
+    [malcolmx.core :as malx]
+    [clojure.walk :refer [keywordize-keys]]))
 
 (defn calc* [workbook-config
              {id :id params :params}
-             & {calc-profile :calc-profile :or {calc-profile false}}]
+             & {profile? :profile? :or {profile? false}}]
   (if-let [result (session/with-locked-workbook workbook-config
-                    (as-> workbook-config $
-                          (set-params params $)
-                          (make-evaluator $)
-                          (extract-eval $ calc-profile)))]
+                    (let [wb (:wb workbook-config)
+                          in-sheet-name (:in_sheet_name workbook-config)
+                          out-sheet-name (:out_sheet_name workbook-config)
+                          str-data (mapv #(hash-map "id" (double (:id %))
+                                                    "value" (:value %))
+                                     params)]
+                      (as-> wb $
+                            (malx/update-sheet! $ in-sheet-name str-data :by "id")
+                            (malx/get-sheet $ out-sheet-name :profile? profile?)
+                            (mapv keywordize-keys $)
+                            (assoc {:type :OUTCOMES} :data $))))]
     result
     {:type       :ERROR
      :error_type :INPROGRESS
-     :error      (str "Workbook: " id " calculation inprogress")}))
+     :error      (format "Workbook: %s calculation inprogress" id)}))
 
 (defn calc [{storage :storage :as session-store}
             {id :id ssid :ssid params :params :as args}
@@ -41,6 +42,4 @@
   (let [workbook-config (session/create-or-prolong session-store id ssid)
         rev (:rev workbook-config)]
     (cache/with-cache-by-key storage {:id id :rev rev :params params}
-      (if calc-profile
-        (response/packet-init (utils/with-timer (calc* workbook-config args :calc-profile calc-profile)))
-        (response/packet-init (calc* workbook-config args :calc-profile calc-profile))))))
+      (response/packet-init (calc* workbook-config args :profile? calc-profile)))))
