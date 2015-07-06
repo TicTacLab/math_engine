@@ -43,13 +43,12 @@
 
 (defn models-in-params-handler [{web :web
                                  params :params :as req}]
-  (let [{:keys [id ssid]} params 
+  (let [{:keys [id ssid]} params
         model-id (Integer/valueOf ^String id)]
-    (some->>
-     (session/create-or-prolong (:session-store web) model-id ssid)
-     :params
-     (map (fn [param] (-> param val first (select-keys [:type :name :code :id :value]))))
-     json/generate-string)))
+    (->> (session/create-or-prolong (:session-store web) model-id ssid)
+         :params
+         (map (fn [param] (-> param val first (select-keys [:type :name :code :id :value]))))
+         json/generate-string)))
 
 
 (defroutes routes
