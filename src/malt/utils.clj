@@ -10,14 +10,3 @@
   (if (integer? x)
     x
     (Integer/parseInt x)))
-
-(defmacro with-timer [& body]
-  `(let [start# (. System (nanoTime))
-        ret# (do ~@body)
-        time-call#
-        (/
-         (double 
-          (- (. System (nanoTime)) start#))
-         1000000.0)]
-    (assoc ret# :timer (int time-call#))))
-

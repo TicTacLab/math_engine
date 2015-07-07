@@ -1,13 +1,8 @@
 (ns malt.math-parser.core
   (:require
-    [clojure.tools.logging :as logger :only (info error)]
-    [malt.math-parser.params :refer [set-params]]
-    [malt.utils :as utils]
     [malt.session :as session]
-    [malt.storage :as storage]
     [malt.storage
      [cache :as cache]
-     [models :as models]
      [in-params :as in-params]]
     [malt.response :as response]
     [metrics.meters :as meter]
