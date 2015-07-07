@@ -18,6 +18,8 @@
             [cheshire.core :as json]
             [clojure.pprint :refer (pprint)]
             [malt.session :as session]
+            [malcolmx.core :as malx]
+            [clojure.walk :refer [keywordize-keys]]
             [clojure.java.io :as io])
   (:import (org.eclipse.jetty.server Server)))
 
@@ -44,11 +46,15 @@
 (defn models-in-params-handler [{web :web
                                  params :params :as req}]
   (let [{:keys [id ssid]} params
-        model-id (Integer/valueOf ^String id)]
-    (->> (session/create-or-prolong (:session-store web) model-id ssid)
-         :params
-         (map (fn [param] (-> param val first (select-keys [:type :name :code :id :value]))))
-         json/generate-string)))
+        model-id (Integer/valueOf ^String id)
+        session (session/create-or-prolong (:session-store web) model-id ssid)
+        workbook (:wb session)
+        in-sheet-name (:in_sheet_name session)
+        new-in-params (as-> workbook $
+                            (malx/get-sheet $ in-sheet-name)
+                            (map keywordize-keys $)
+                            (map #(update-in % [:id] long) $))]
+    (json/generate-string new-in-params)))
 
 
 (defroutes routes
