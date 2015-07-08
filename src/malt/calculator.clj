@@ -1,4 +1,4 @@
-(ns malt.calc
+(ns malt.calculator
   (:require
     [malt.session :as session]
     [malt.storage

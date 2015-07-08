@@ -17,7 +17,7 @@
        :web             (component/using
                           (w/new-web config)
                           [:storage :session-store])
-       #_:zabbix-reporter #_(zabbix/new-zabbix-reporter
+       :zabbix-reporter (zabbix/new-zabbix-reporter
                           {:hostname         monitoring-hostname
                            :zabbix-host      zabbix-host
                            :zabbix-port      zabbix-port

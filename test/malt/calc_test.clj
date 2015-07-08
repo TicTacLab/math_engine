@@ -1,6 +1,6 @@
 (ns malt.calc-test
   (:require [malt.system :as s]
-            [malt.calc :as parser]
+            [malt.calculator :as parser]
             [malt.session :as sess]
             [clojure.test :refer :all]
             [com.stuartsierra.component :as component]
@@ -12,9 +12,9 @@
     (try
       (let [session-store (:session-store sys)
             workbook-config (sess/config-to-workbook {:file           (io/file "test/malt/test-model.xls")
-                                            :in_sheet_name  "IN"
-                                            :out_sheet_name "OUT"
-                                            :id             1})]
+                                                      :in_sheet_name  "IN"
+                                                      :out_sheet_name "OUT"
+                                                      :id             1})]
         (sess/prolong! session-store "BADA55" workbook-config)
         (let [result (->> (parser/calc* workbook-config
                                         {:id 1 :ssid "BADA55" :params [{:id 1 :value 1.0}
@@ -23,8 +23,7 @@
                                                                        {:id 4 :value 1.0}]})
                           :data
                           set)]
-          (is (= result
-                 #{{:coef    2.0
+          (is (= #{{:coef    2.0
                     :id      1.0
                     :m_code  "MATCH_BETTING"
                     :market  "3 way - Who will win the match"
@@ -55,6 +54,7 @@
                     :o_code  "HOME_DRAW"
                     :outcome "1X"
                     :param   999999.0
-                    :mn_weight 4.0}}))))
+                    :mn_weight 4.0}}
+                 result))))
       (finally
         (component/stop sys)))))

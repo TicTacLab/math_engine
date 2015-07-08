@@ -7,7 +7,7 @@
             [clojure.tools.logging :as log]
             [malt.storage.models :refer (get-model)]
             [malt.storage.calculation-log :as calc-log]
-            [malt.calc :refer (calc)]
+            [malt.calculator :refer [calc]]
             [malt.utils :refer (string-to-double string-to-integer)]
             [ring.middleware
              [params :refer (wrap-params)]

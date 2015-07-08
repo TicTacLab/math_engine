@@ -16,20 +16,20 @@
 (extend-protocol OutcomeProtocol
   nil
   (pack [this] this)
-  java.lang.Long
+  Long
   (pack [this] this)
-  java.lang.Float
+  Float
   (pack [this] this)
-  java.lang.String
+  String
   (pack [this] this)
-  java.lang.Integer
+  Integer
   (pack [this] this)
   )
 
 (defrecord ErrorItem
   [field value error]
   OutcomeProtocol
-  (pack [this] (protobuf ErrorProto
+  (pack [_this] (protobuf ErrorProto
                          :field field
                          :value (str value)
                          :err error)))
@@ -43,7 +43,7 @@
 
 ;; validate funcs
 
-(def is-float? #(instance? java.lang.Float %))
+(def is-float? #(instance? Float %))
 (def item-integer (partial validate integer? int 0))
 (def item-string (partial validate string? str ""))
 (def item-float (partial validate is-float? float (float 0.0)))
@@ -53,23 +53,21 @@
 (defrecord OutcomeItem
   [id market outcome coef param m_code o_code param2 mgp_code mn_code mgp_weight mn_weight timer error]
   OutcomeProtocol
-  (pack [this]
-    (let [errors (filter #(string? (:error %))
-                         [id market outcome coef param m_code o_code param2 timer])]
-      (protobuf OutcomeProto
-                :id (:value id)
-                :market (:value market)
-                :outcome (:value outcome)
-                :coef (:value coef)
-                :param (:value param)
-                :m_code (:value m_code)
-                :o_code (:value o_code)
-                :param2 (:value param2)
-                :mgp_code (:value mgp_code)
-                :mn_code (:value mn_code)
-                :mgp_weight (:value mgp_weight)
-                :mn_weight (:value mn_weight)
-                :timer (:value timer)))))
+  (pack [_this]
+    (protobuf OutcomeProto
+              :id (:value id)
+              :market (:value market)
+              :outcome (:value outcome)
+              :coef (:value coef)
+              :param (:value param)
+              :m_code (:value m_code)
+              :o_code (:value o_code)
+              :param2 (:value param2)
+              :mgp_code (:value mgp_code)
+              :mn_code (:value mn_code)
+              :mgp_weight (:value mgp_weight)
+              :mn_weight (:value mn_weight)
+              :timer (:value timer))))
 
 (defn outcome-init [o]
   (-> o
@@ -93,7 +91,7 @@
 (defrecord PacketItem
   [type data]
   OutcomeProtocol
-  (pack [this] (protobuf Packet :type type :data (map pack data))))
+  (pack [_this] (protobuf Packet :type type :data (map pack data))))
 
 (defmulti packet-init :type)
 
