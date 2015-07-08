@@ -1,6 +1,6 @@
 (ns malt.calc-test
   (:require [malt.system :as s]
-            [malt.math-parser.core :as parser]
+            [malt.calc :as parser]
             [malt.session :as sess]
             [clojure.test :refer :all]
             [com.stuartsierra.component :as component]

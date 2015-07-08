@@ -1,5 +1,5 @@
  (ns bench
-   (:require [malt.math-parser.core :as c]
+   (:require [malt.math-parser.math-parser :as c]
              [criterium.core :as cr]
              [org.httpkit.client :as http]
              [cheshire.core :as json]

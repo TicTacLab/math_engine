@@ -1,4 +1,4 @@
-(ns malt.math-parser.core
+(ns malt.calc
   (:require
     [malt.session :as session]
     [malt.storage

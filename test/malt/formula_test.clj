@@ -1,6 +1,6 @@
 (ns malt.formula-test
   (:use clojure.test
-        malt.math-parser.core
+        malt.calc
         [malt.math-parser.math-xls :as m])
   (:require [malt.math-parser.xls-types :as xtypes]
             [malt.test-helper :as th])
