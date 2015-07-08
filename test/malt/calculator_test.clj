@@ -1,4 +1,4 @@
-(ns malt.calc-test
+(ns malt.calculator-test
   (:require [malt.system :as s]
             [malt.calculator :as parser]
             [malt.session :as sess]
