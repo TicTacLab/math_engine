@@ -54,12 +54,20 @@
                             (map #(update-in % [:id] long) $))]
     (json/generate-string new-in-params)))
 
+(defn destroy-session [{{sstore :session-store} :web
+                        {ssid   :ssid}          :params}]
+  (when-let [workbook-config (session/fetch sstore ssid)]
+    (if (session/with-locked-workbook workbook-config
+          (session/delete! sstore ssid))
+      "ok"
+      {:code 409
+       :body (format "Workbook: %s calculation inprogress" (:id workbook-config))})))
 
 (defroutes routes
-
-  (GET "/model/in-params" req (models-in-params-handler req))
+  (GET    "/model/in-params" req (models-in-params-handler req))
   (POST   "/model/calc/:ssid" req (calc-handler req :profile? true))
   (POST   "/model/calc/:ssid/binary" req (calc-handler req :profile? false))
+  (DELETE "/session/:ssid" req (destroy-session req))
   (route/not-found "<h1>Page not found!</h1>"))
 
 (defn wrap-with-web [h web]

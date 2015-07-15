@@ -8,7 +8,8 @@
     [metrics.core :as metrics]
     [malcolmx.core :as malx])
   (:import [clojure.lang PersistentArrayMap]
-           [java.util.concurrent Semaphore]))
+           [java.util.concurrent Semaphore]
+           (org.apache.poi.ss.usermodel Workbook)))
 
 (defrecord WorkbookConfig [id rev wb file_name file ssid lock in_sheet_name out_sheet_name])
 
@@ -46,6 +47,13 @@
                                   config-to-workbook
                                   (assoc :ssid ssid))))))
       (get ssid)))
+
+(defn delete! [session-store ssid]
+  (let [workbook-config (fetch session-store ssid)]
+    (swap! (:session-table session-store) cache/evict ssid)
+    (try (.close ^Workbook (:wb workbook-config))
+         (catch Exception _))
+    true))
 
 (defn create-or-prolong [session-store id ssid]
   (if-let [session (fetch session-store ssid)]
