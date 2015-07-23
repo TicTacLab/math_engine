@@ -65,8 +65,8 @@
 
 (defroutes routes
   (GET "/model/in-params" req (models-in-params-handler req))
-  (POST "/model/calc/:ssid" req (calc-handler req :profile? true))
-  (POST "/model/calc/:ssid/binary" req (calc-handler req :profile? false))
+  (POST "/model/calc/:ssid/profile" req (calc-handler req :profile? true))
+  (POST "/model/calc/:ssid" req (calc-handler req :profile? false))
   (DELETE "/session/:ssid" req (destroy-session req))
   (route/not-found "<h1>Page not found!</h1>"))
 
