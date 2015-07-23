@@ -38,8 +38,8 @@
         result (or (calc session-store args :profile? profile?)
                    {:error "Service is busy"})]
     (calc-log/write! (:storage session-store) (:ssid args) (:id args) (:params args) result)
-    (res/content-type {:body (io/input-stream result)}
-                      "application/octet-stream")))
+    (res/content-type {:body (json/generate-string result)}
+                      "application/json")))
 
 (defn models-in-params-handler [{web :web
                                  params :params :as req}]
@@ -64,9 +64,9 @@
        :body (format "Workbook: %s calculation inprogress" (:id workbook-config))})))
 
 (defroutes routes
-  (GET    "/model/in-params" req (models-in-params-handler req))
-  (POST   "/model/calc/:ssid" req (calc-handler req :profile? true))
-  (POST   "/model/calc/:ssid/binary" req (calc-handler req :profile? false))
+  (GET "/model/in-params" req (models-in-params-handler req))
+  (POST "/model/calc/:ssid" req (calc-handler req :profile? true))
+  (POST "/model/calc/:ssid/binary" req (calc-handler req :profile? false))
   (DELETE "/session/:ssid" req (destroy-session req))
   (route/not-found "<h1>Page not found!</h1>"))
 

@@ -9,6 +9,9 @@
     [malcolmx.core :as malx]
     [clojure.walk :refer [keywordize-keys]]))
 
+(defn non-empty-outcome [outcome]
+  (:id outcome))
+
 (defn calc* [workbook-config
              {id :id params :params}
              & {profile? :profile? :or {profile? false}}]
@@ -23,6 +26,7 @@
                             (malx/update-sheet! $ in-sheet-name str-data :by "id")
                             (malx/get-sheet $ out-sheet-name :profile? profile?)
                             (mapv keywordize-keys $)
+                            (filter non-empty-outcome $)
                             (assoc {:type :OUTCOMES} :data $))))]
     result
     {:type       :ERROR
@@ -37,4 +41,4 @@
   (let [workbook-config (session/create-or-prolong session-store id ssid)
         rev (:rev workbook-config)]
     (cache/with-cache-by-key storage {:id id :rev rev :params params}
-      (response/packet-init (calc* workbook-config args :profile? profile?)))))
+      (calc* workbook-config args :profile? profile?))))
