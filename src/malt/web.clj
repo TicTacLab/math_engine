@@ -18,8 +18,14 @@
             [malt.session :as session]
             [malcolmx.core :as malx]
             [clojure.walk :refer [keywordize-keys]]
-            [clojure.java.io :as io])
+            [malt.storage.models :as models])
   (:import (org.eclipse.jetty.server Server)))
+
+(defn json-error [status code message]
+  {:status status
+   :body (json/generate-string {:status status
+                                :errors [{:code    code
+                                          :message message}]})})
 
 (defn param-to-value [{:keys [id value]}]
   {:value (try (string-to-double value)
@@ -41,21 +47,23 @@
     (res/content-type {:body (json/generate-string result)}
                       "application/json")))
 
-(defn models-in-params-handler [{web :web
-                                 params :params :as req}]
-  (let [{:keys [id ssid]} params
-        model-id (Integer/valueOf ^String id)
-        session (session/create-or-prolong (:session-store web) model-id ssid)
-        workbook (:wb session)
-        in-sheet-name (:in_sheet_name session)
-        new-in-params (as-> workbook $
+(defn models-in-params-handler [{{storage :storage :as web}  :web
+                                 params :params}]
+  (let [{:keys [model-id ssid]} params
+        model-id (Integer/valueOf ^String model-id)]
+    (if (models/valid-model? storage model-id)
+      (let [session (session/create-or-prolong (:session-store web) model-id ssid)
+            workbook (:wb session)
+            in-sheet-name (:in_sheet_name session)
+            in-params (as-> workbook $
                             (malx/get-sheet $ in-sheet-name)
                             (map keywordize-keys $)
                             (map #(update-in % [:id] long) $))]
-    (json/generate-string new-in-params)))
+        (json/generate-string in-params))
+      (json-error 404 "MNF" "Model not found"))))
 
 (defn destroy-session [{{sstore :session-store} :web
-                        {ssid   :ssid}          :params}]
+                        {ssid :ssid}            :params}]
   (when-let [workbook-config (session/fetch sstore ssid)]
     (if (session/with-locked-workbook workbook-config
           (session/delete! sstore ssid))
@@ -64,7 +72,7 @@
        :body (format "Workbook: %s calculation inprogress" (:id workbook-config))})))
 
 (defroutes routes
-  (GET "/model/in-params" req (models-in-params-handler req))
+  (GET "/model/:model-id/:ssid/in-params" req (models-in-params-handler req))
   (POST "/model/calc/:ssid/profile" req (calc-handler req :profile? true))
   (POST "/model/calc/:ssid" req (calc-handler req :profile? false))
   (DELETE "/session/:ssid" req (destroy-session req))

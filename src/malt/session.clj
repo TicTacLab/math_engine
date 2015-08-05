@@ -31,9 +31,9 @@
       deref
       (cache/lookup ssid)))
 
-(defn prolong! [session-store ssid v]
-  (swap! (get session-store :session-table) assoc ssid v)
-  v)
+(defn prolong! [session-store ssid session]
+  (swap! (get session-store :session-table) assoc ssid session)
+  session)
 
 (defn create! [session-store id ssid]
   (-> (:session-table session-store)
