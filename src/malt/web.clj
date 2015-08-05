@@ -27,6 +27,9 @@
                                 :errors [{:code    code
                                           :message message}]})})
 
+(def error-404-mnf (json-error 404 "MNF" "Model not found"))
+(def error-423-cip (json-error 423 "CIP" "Calculation is in progress"))
+
 (defn param-to-value [{:keys [id value]}]
   {:value (try (string-to-double value)
                (catch Exception e value))
@@ -61,22 +64,23 @@
                             (map #(update-in % [:id] long) $))]
         (json/generate-string {:status 200
                                :data   in-params}))
-      (json-error 404 "MNF" "Model not found"))))
+      error-404-mnf)))
 
 (defn destroy-session [{{sstore :session-store} :web
                         {ssid :ssid}            :params}]
-  (when-let [workbook-config (session/fetch sstore ssid)]
+  ;; omg, ugliest code ever
+  (if-let [workbook-config (session/fetch sstore ssid)]
     (if (session/with-locked-workbook workbook-config
-          (session/delete! sstore ssid))
-      "ok"
-      {:code 409
-       :body (format "Workbook: %s calculation inprogress" (:id workbook-config))})))
+                                      (session/delete! sstore ssid))
+      {:status 204}
+      error-423-cip)
+    {:status 204}))
 
 (defroutes routes
-  (GET "/model/:model-id/:ssid/in-params" req (models-in-params-handler req))
+  (GET "/models/:model-id/:ssid/in-params" req (models-in-params-handler req))
   (POST "/model/calc/:ssid/profile" req (calc-handler req :profile? true))
   (POST "/model/calc/:ssid" req (calc-handler req :profile? false))
-  (DELETE "/session/:ssid" req (destroy-session req))
+  (DELETE "/models/:model-id/:ssid" req (destroy-session req))
   (route/not-found "<h1>Page not found!</h1>"))
 
 (defn wrap-with-web [h web]
