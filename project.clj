@@ -21,7 +21,7 @@
                  [com.betinvest/zabbix-clojure-agent "0.1.8"]
                  [clojurewerkz/cassaforte "2.0.0"]
                  [com.stuartsierra/component "0.2.2"]
-                 [prismatic/schema "0.3.7"]
+                 [prismatic/schema "0.4.3"]
                  [cheshire "5.4.0"]
                  [javax.servlet/javax.servlet-api "3.1.0"]
                  [compojure "1.2.0"]

@@ -1,11 +1,9 @@
 (ns malt.web
-  (:require [compojure.core :refer (defroutes GET POST PUT DELETE wrap-routes)]
+  (:require [compojure.core :refer (defroutes ANY GET POST PUT DELETE wrap-routes)]
             [schema.core :as s]
-            [compojure.route :as route]
             [ring.adapter.jetty :as jetty]
             [com.stuartsierra.component :as component]
             [clojure.tools.logging :as log]
-            [malt.storage.models :refer (get-model)]
             [malt.storage.calculation-log :as calc-log]
             [malt.calculator :refer [calc]]
             [malt.utils :refer (string-to-double string-to-integer)]
@@ -27,28 +25,42 @@
                                 :errors [{:code    code
                                           :message message}]})})
 
-(def error-404-mnf (json-error 404 "MNF" "Model not found"))
-(def error-423-cip (json-error 423 "CIP" "Calculation is in progress"))
+(defn json-result [status result]
+  {:status status
+   :body (json/generate-string {:status status
+                                :data result})})
 
-(defn param-to-value [{:keys [id value]}]
+(def error-400-mfp (json-error 400 "MFP" "Malformed params"))
+(def error-404-mnf (json-error 404 "MNF" "Model not found"))
+(def error-404-rnf (json-error 404 "RNF" "Resource not found"))
+(def error-423-cip (json-error 423 "CIP" "Calculation is in progress"))
+(def error-500-ise (json-error 500 "ISE" "Internal server error"))
+
+;; FIXME: purpose?
+(defn coerce-params-fields [{:keys [id value]}]
   {:value (try (string-to-double value)
-               (catch Exception e value))
+               (catch Exception _ value))
    :id    (string-to-integer id)})
 
+(def calculate-body-schema {:model_id s/Int
+                              :event_id s/Str
+                              :params [{:id s/Str
+                                        :value s/Str}]})
 (defn calc-handler [{{session-store :session-store} :web
-                    {ssid :ssid} :params :as req}
+                     :as req}
                     & {:keys [profile?] :or {profile? false}}]
-  (let [args (-> req
-                 req/body-string
-                 (json/parse-string true)
-                 (update-in [:id] string-to-integer)
-                 (update-in [:params] #(mapv param-to-value %))
-                 (assoc :ssid ssid))
-        result (or (calc session-store args :profile? profile?)
-                   {:error "Service is busy"})]
-    (calc-log/write! (:storage session-store) (:ssid args) (:id args) (:params args) result)
-    (res/content-type {:body (json/generate-string result)}
-                      "application/json")))
+  (let [json-body (json/parse-string (req/body-string req) true)]
+    (if-let [check-result (s/check calculate-body-schema json-body)]
+      (do
+        (log/error "Malformed params for CALCULATE request: %s, reason %s" json-body check-result)
+        error-400-mfp)
+      (let [args (update-in json-body [:params] #(mapv coerce-params-fields %))]
+        (if-let [result (calc session-store args :profile? profile?)]
+          (do
+            (calc-log/write! (:storage session-store) (:ssid args) (:id args) (:params args) result)
+            (json-result 200 result))
+          error-423-cip)))))
+
 
 (defn models-in-params-handler [{{storage :storage :as web}  :web
                                  params :params}]
@@ -78,20 +90,37 @@
 
 (defroutes routes
   (GET "/models/:model-id/:ssid/in-params" req (models-in-params-handler req))
-  (POST "/model/calc/:ssid/profile" req (calc-handler req :profile? true))
-  (POST "/model/calc/:ssid" req (calc-handler req :profile? false))
+  (POST "/models/:model-id/:ssid/profile" req (calc-handler req :profile? true))
+  (POST "/models/:model-id/:ssid/calculate" req (calc-handler req :profile? false))
   (DELETE "/models/:model-id/:ssid" req (destroy-session req))
-  (route/not-found "<h1>Page not found!</h1>"))
+  (ANY "/*" _ error-404-rnf))
 
 (defn wrap-with-web [h web]
   (fn [req]
     (h (assoc req :web web))))
 
+(defn wrap-internal-server-error [h]
+  (fn [req]
+    (try
+      (h req)
+      (catch Exception e
+        (log/error e "while request handling")
+        error-500-ise))))
+
+(defn wrap-json-content-type [h]
+  (fn [req]
+    (-> req
+        (h)
+        (res/content-type "application/json")
+        (res/charset "utf-8"))))
+
 (defn app [web]
   (-> routes
       (wrap-keyword-params)
       (wrap-params)
-      (wrap-with-web web)))
+      (wrap-with-web web)
+      (wrap-internal-server-error)
+      (wrap-json-content-type)))
 
 (defrecord Web [host port server storage api]
   component/Lifecycle
