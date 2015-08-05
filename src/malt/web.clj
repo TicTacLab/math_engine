@@ -59,7 +59,8 @@
                             (malx/get-sheet $ in-sheet-name)
                             (map keywordize-keys $)
                             (map #(update-in % [:id] long) $))]
-        (json/generate-string in-params))
+        (json/generate-string {:status 200
+                               :data   in-params}))
       (json-error 404 "MNF" "Model not found"))))
 
 (defn destroy-session [{{sstore :session-store} :web
