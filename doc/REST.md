@@ -6,9 +6,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 # Event conduction using math engine
 
 The purpose of Math Engine is calculating of math models written in MS Excel format.
-Guidelines for Excel file preparation are described in Guidelines document.
+Guidelines for Excel file preparation are described in the "Guidelines.xls" file.
 <<<Блять, я не знаю как перевести фразу про in/out.>>>
-IO/OUT sheets are endpoints of interaction between math model and Math Engine. (Math Engine предназначен для расчета матемитических моделей описанных в формате MS Excel.Порядок поготовки моделей для Math engine(ME) описан в документе Guidelines.В данном документе мы будет оперировать такими понятиям как IN-params и OUT-values, которые предстваляют из себя IN/OUT sheets в excel файле. IN/OUT sheet явзяются endpoits для взяимодействия модели и math engine.)
+IN/OUT sheets are the only points of interaction between math model and Math Engine. (Math Engine предназначен для расчета матемитических моделей описанных в формате MS Excel.Порядок поготовки моделей для Math engine(ME) описан в документе Guidelines.В данном документе мы будет оперировать такими понятиям как IN-params и OUT-values, которые предстваляют из себя IN/OUT sheets в excel файле. IN/OUT sheet явзяются endpoits для взяимодействия модели и math engine.)
 
 ME usage steps: (Порядок работы с ME состоит из следующих шагов:)
 1. Passing unique event-id
