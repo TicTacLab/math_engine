@@ -46,20 +46,24 @@
                               :event_id s/Str
                               :params [{:id s/Str
                                         :value s/Str}]})
-(defn calc-handler [{{session-store :session-store} :web
+(defn calc-handler [{{session-store :session-store
+                      storage :storage} :web
                      :as req}
                     & {:keys [profile?] :or {profile? false}}]
-  (let [json-body (json/parse-string (req/body-string req) true)]
-    (if-let [check-result (s/check calculate-body-schema json-body)]
-      (do
-        (log/error "Malformed params for CALCULATE request: %s, reason %s" json-body check-result)
-        error-400-mfp)
-      (let [args (update-in json-body [:params] #(mapv coerce-params-fields %))]
-        (if-let [result (calc session-store args :profile? profile?)]
-          (do
-            (calc-log/write! (:storage session-store) (:ssid args) (:id args) (:params args) result)
-            (json-result 200 result))
-          error-423-cip)))))
+  (let [json-body (json/parse-string (req/body-string req) true)
+        model-id (:model_id json-body)]
+    (if (models/valid-model? storage model-id)
+      (if-let [check-result (s/check calculate-body-schema json-body)]
+        (do
+          (log/error "Malformed params for CALCULATE request: %s, reason %s" json-body check-result)
+          error-400-mfp)
+        (let [args (update-in json-body [:params] #(mapv coerce-params-fields %))]
+          (if-let [result (calc session-store args :profile? profile?)]
+            (do
+              (calc-log/write! (:storage session-store) (:ssid args) (:id args) (:params args) result)
+              (json-result 200 result))
+            error-423-cip)))
+      error-404-mnf)))
 
 
 (defn models-in-params-handler [{{storage :storage :as web}  :web
