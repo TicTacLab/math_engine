@@ -17,11 +17,10 @@
                                                       :id             1})]
         (sess/prolong! session-store "BADA55" workbook-config)
         (let [result (->> (parser/calc* workbook-config
-                                        {:id 1 :ssid "BADA55" :params [{:id 1 :value 1.0}
-                                                                       {:id 2 :value 1.0}
-                                                                       {:id 3 :value 1.0}
-                                                                       {:id 4 :value 1.0}]})
-                          :data
+                                        {:model_id 1 :event_id "BADA55" :params [{:id 1 :value 1.0}
+                                                                                 {:id 2 :value 1.0}
+                                                                                 {:id 3 :value 1.0}
+                                                                                 {:id 4 :value 1.0}]})
                           set)]
           (is (= #{{:coef    2.0
                     :id      1.0

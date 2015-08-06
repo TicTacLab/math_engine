@@ -4,7 +4,6 @@
     [malt.storage
      [cache :as cache]
      [in-params :as in-params]]
-    [malt.response :as response]
     [metrics.meters :as meter]
     [malcolmx.core :as malx]
     [clojure.walk :refer [keywordize-keys]]))
