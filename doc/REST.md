@@ -5,33 +5,32 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 # Event conduction using math engine
 
-Math Engine предназначен для расчета матемитических моделей описанных в формате MS Excel.
-Порядок поготовки моделей для Math engine(ME) описан в документе Guidelines.
-В данном документе мы будет оперировать такими понятиям как IN-params и OUT-values, которые предстваляют из себя IN/OUT sheets в excel файле. IN/OUT sheet явзяются endpoits для взяимодействия модели и math engine.
+The purpose of Math Engine is calculating of math models written in MS Excel format.
+Guidelines for Excel file preparation are described in Guidelines document.
+<<<Блять, я не знаю как перевести фразу про in/out.>>>
+IO/OUT sheets are endpoints of interaction between math model and Math Engine. (Math Engine предназначен для расчета матемитических моделей описанных в формате MS Excel.Порядок поготовки моделей для Math engine(ME) описан в документе Guidelines.В данном документе мы будет оперировать такими понятиям как IN-params и OUT-values, которые предстваляют из себя IN/OUT sheets в excel файле. IN/OUT sheet явзяются endpoits для взяимодействия модели и math engine.)
 
-
-Порядок работы с ME состоит из следующих шагов:
+ME usage steps: (Порядок работы с ME состоит из следующих шагов:)
 1. Passing unique event-id
 2. Filling IN-params and getting model's OUT-values
 3. Deallocating resources
 
 1. Passing unique event-id
-Для ускорения расчета ME выделяет вычислительные ресурсы под каждое событие. Что бы уникально иденитфицировать событие ME необходим уникатльный event-id. Пара event-id + model-id однозначно идентифицирует собитие внитри ME.
+For calculation speed up ME allocates computation resources for every sport event. For unique identification of event ME needs unique couple of event-id and model-id. (Для ускорения расчета ME выделяет вычислительные ресурсы под каждое событие. Что бы уникально иденитфицировать событие ME необходим уникатльный event-id. Пара event-id + model-id однозначно идентифицирует собитие внитри ME.)
 
-Ресурсы выделяются "лениво", при превом запросе методов CALCULATE/IN-PARAMS, поэтому результат первого запроса вычисляется дольше чем последующие. Также ресурсы будут выделены повторно поле вызова метода RELEASE.
+Resources are allocated "lazily", after first call of method CALCULATE or IN-PARAMS. Because of this first request is processed longer then subsequent. Also resources will be allocated again if method CALCULATE or IN-PARAMS called after RELEASE with the same model-id and event-id. (Ресурсы выделяются "лениво", при превом выполнении методов CALCULATE/IN-PARAMS, поэтому результат первого запроса вычисляется дольше чем последующие. Также ресурсы будут выделены повторно если перед методами CALCULATE/IN-PARAMS был вызван метод RELEASE.)
 
 2. Filling IN-params and getting model's OUT-values
-IN-params в модели должны быть предствленны в виде обязательных пар id + value на странице IN. IN sheet может содержать любое кол-во опциональных колонок.
-API позволяет получить предствление IN sheet в виде JSON с помощью метода IN-PARAMS.
+IN-params in Excel model file should be represented as required pairs of id + value on the IN sheet. IN sheet can also countain any number of optional columns.
+API allows to get IN sheet data as JSON using IN-PARAMS method. (IN-params в модели должны быть предствленны в виде обязательных пар id + value на странице IN. IN sheet может содержать любое кол-во опциональных колонок. API позволяет получить предствление IN sheet в виде JSON с помощью метода IN-PARAMS.)
 
-OUT-values это сериализированныя в JSON страница OUT рассчитанная по заданым IN-params.
-Что бы получить OUT-values нужно выполнить метод CALCULATE с заданными IN-params.
+OUT-values are JSON representation of OUT sheet which is evaluated using IN-params.
+CALCULATE method returns OUT-values as JSON by applying passed IN-params. (OUT-values это сериализированныя в JSON страница OUT рассчитанная по заданым IN-params. Что бы получить OUT-values нужно выполнить метод CALCULATE с заданными IN-params.)
 
-Что бы сделать повторный запрос на расчет нужно дождаться завершения предыдущего для данного события, иначе ME вернет ошибку 423 "calculation in progress".
+Requests to single event are executed sequentially, ME will lock event until request returns. Calling methods on locked event will result in 423 "Calculation in progress" error. (Что бы сделать повторный запрос на расчет нужно дождаться завершения предыдущего для данного события, иначе ME вернет ошибку 423 "calculation in progress".)
 
 3. Deallocating resources
-После окончания события необходимо освободить ресурсы ME с помощью метода RELEASE.
-Ресурсы осовбождаются автоматически если к заданному событию не было запросов через интервал <<NNN>>
+When interation with ME on partucular event is ended, client should release computation resources by calling method RELEASE. Also resorces will be released automatically after some period of time, usually 15 minutes. (После окончания события необходимо освободить ресурсы ME с помощью метода RELEASE. Ресурсы осовбождаются автоматически если к заданному событию не было запросов через интервал <<NNN>>)
 
 
 # REST API
@@ -103,8 +102,8 @@ Return in params for specified model. event-id and model-id couple should be uni
 ### Request body
 ```
 {
-  "model_id" : 120, // int
-  "event_id" : "72c361803a5b116e0682581fe958fdee",  // string
+  "model_id" : 120, // int  --- есть идея выпилить нифиг, оно тебе есть в URL
+  "event_id" : "72c361803a5b116e0682581fe958fdee",  // string --- это тоже
   "params" : [
     {
       "id" : "9", // string
