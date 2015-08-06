@@ -144,6 +144,19 @@ Return in params for specified model. event-id and model-id couple should be uni
   ]
 }
 ```
+--- есть идея выпилить model_id и event_id поскольку они уже есть в URL, сделать тело просто массивом
+```
+[
+  {
+    "id" : "9", // string
+    "value" : "150.0" // string
+  }, 
+  {
+    "id" : "3",
+    "value" : "0.0"
+  }
+]
+```
 request body is a json object and should contain ALL models in-parameters for correct computation.
 
 ### Responses
