@@ -47,23 +47,24 @@
             [lein-environ "1.0.0"]]
 
   :profiles {:dev  {:source-paths ["dev"]
-                    :global-vars {*warn-on-reflection* true}
+                    :global-vars  {*warn-on-reflection* false}
                     :dependencies [[ns-tracker "0.2.2"]
                                    [aprint "0.1.0"]
                                    [http-kit.fake "0.2.1"]
-                                   [http-kit "2.1.16"]
+                                   [http-kit "2.1.18"]
                                    [criterium "0.4.3"]
                                    [im.chit/vinyasa "0.3.4"]
                                    [org.clojure/tools.trace "0.7.8"]]
 
-                    :injections [(require '[vinyasa.inject :as inject])
-                                 (require 'aprint.core)
-                                 (require 'clojure.pprint)
-                                 (require 'clojure.tools.trace)
-                                 (require 'criterium.core)
-                                 (inject/in clojure.core >
-                                            [aprint.core aprint]
-                                            [clojure.pprint pprint]
-                                            [clojure.tools.trace trace]
-                                            [criterium.core bench])]}}
+                    :injections   [(require '[vinyasa.inject :as inject])
+                                   (require 'aprint.core)
+                                   (require 'clojure.pprint)
+                                   (require 'clojure.tools.trace)
+                                   (require 'criterium.core)
+                                   (inject/in clojure.core >
+                                              [aprint.core aprint]
+                                              [clojure.pprint pprint]
+                                              [clojure.tools.trace trace]
+                                              [criterium.core bench])]}
+             :test {:dependencies [[http-kit "2.1.18"]]}}
   :main malt.main)

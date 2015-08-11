@@ -12,8 +12,8 @@
   (:id outcome))
 
 (defn calc* [workbook-config
-             {params :params}
-             & {profile? :profile? :or {profile? false}}]
+             params
+             profile?]
   (session/with-locked-workbook workbook-config
                                 (let [wb (:wb workbook-config)
                                       in-sheet-name (:in_sheet_name workbook-config)
@@ -28,11 +28,13 @@
                                         (filter non-empty-outcome $)))))
 
 (defn calc [{storage :storage :as session-store}
-            {id :model_id ssid :event_id params :params :as args}
-            & {profile? :profile?}]
+            model-id
+            event-id
+            params
+            profile?]
   (meter/mark! (:calls storage))
-  (in-params/write! storage id params)
-  (let [workbook-config (session/create-or-prolong session-store id ssid)
+  (in-params/write! storage model-id params)
+  (let [workbook-config (session/create-or-prolong session-store model-id event-id)
         rev (:rev workbook-config)]
-    (cache/with-cache-by-key storage {:id id :rev rev :params params}
-      (calc* workbook-config args :profile? profile?))))
+    (cache/with-cache-by-key storage {:id model-id :rev rev :params params}
+      (calc* workbook-config params profile?))))

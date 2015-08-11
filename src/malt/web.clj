@@ -19,22 +19,23 @@
             [malt.storage.models :as models])
   (:import (org.eclipse.jetty.server Server)))
 
-(defn json-error [status code message]
+(defn error-response [status code message]
   {:status status
-   :body (json/generate-string {:status status
-                                :errors [{:code    code
-                                          :message message}]})})
+   :errors [{:code    code
+             :message message}]})
 
-(defn json-result [status result]
+(defn success-response [status result]
   {:status status
-   :body (json/generate-string {:status status
-                                :data result})})
+   :data   result})
 
-(def error-400-mfp (json-error 400 "MFP" "Malformed params"))
-(def error-404-mnf (json-error 404 "MNF" "Model not found"))
-(def error-404-rnf (json-error 404 "RNF" "Resource not found"))
-(def error-423-cip (json-error 423 "CIP" "Calculation is in progress"))
-(def error-500-ise (json-error 500 "ISE" "Internal server error"))
+(defn response->json-response [json]
+  {:status (:status json)
+   :body (json/generate-string json)})
+
+(def error-404-mnf (error-response 404 "MNF" "Model not found"))
+(def error-404-rnf (error-response 404 "RNF" "Resource not found"))
+(def error-423-cip (error-response 423 "CIP" "Calculation is in progress"))
+(def error-500-ise (error-response 500 "ISE" "Internal server error"))
 
 ;; FIXME: purpose?
 (defn coerce-params-fields [{:keys [id value]}]
@@ -42,62 +43,106 @@
                (catch Exception _ value))
    :id    (string-to-integer id)})
 
-(def calculate-body-schema {:model_id s/Int
-                              :event_id s/Str
-                              :params [{:id s/Str
-                                        :value s/Str}]})
+(defn try-string->int [value]
+  (try
+    (Integer/valueOf ^String value)
+    (catch Exception _
+      value)))
+
+(defn try-string->json [value]
+  (try
+    (json/parse-string value true)
+    (catch Exception _
+      value)))
+
+(defn return-with-log [value msgf & args]
+  (log/info (apply format (cons msgf args)))
+  value)
+
+(defn calculate-model-out-values [session-store model-id event-id params profile?]
+  (let [params (mapv coerce-params-fields params)] ;; FIXME: remove coersion?
+    (if-let [result (calc session-store model-id event-id params profile?)]
+      (do
+        (calc-log/write! (:storage session-store) model-id event-id params result)
+        (success-response 200 result))
+      (return-with-log error-423-cip
+                      "Calculation in progress for request: %s %s"
+                      model-id
+                      event-id
+                      params))))
+
+(def calc-handler-body-schema {:model_id s/Int
+                               :event_id s/Str
+                               :params [{:id s/Str
+                                         :value s/Str}]})
+(def calc-handler-params-schema {:model-id s/Int
+                                 :event-id s/Str
+                                 s/Keyword s/Any})
 (defn calc-handler [{{session-store :session-store
                       storage :storage} :web
+                     request-params :params
                      :as req}
                     & {:keys [profile?] :or {profile? false}}]
-  (let [json-body (json/parse-string (req/body-string req) true)
-        model-id (:model_id json-body)]
-    (if (models/valid-model? storage model-id)
-      (if-let [check-result (s/check calculate-body-schema json-body)]
-        (do
-          (log/error "Malformed params for CALCULATE request: %s, reason %s" json-body check-result)
-          error-400-mfp)
-        (let [args (update-in json-body [:params] #(mapv coerce-params-fields %))]
-          (if-let [result (calc session-store args :profile? profile?)]
-            (do
-              (calc-log/write! (:storage session-store) (:ssid args) (:id args) (:params args) result)
-              (json-result 200 result))
-            error-423-cip)))
-      error-404-mnf)))
+  (let [json-body (try-string->json (req/body-string req))
+        {:keys [model-id event-id] :as params} (update-in request-params [:model-id] try-string->int)
+        params-checking-result (s/check calc-handler-params-schema params)
+        json-checking-result (s/check calc-handler-body-schema json-body)]
+
+    (response->json-response
+      (cond
+        params-checking-result (return-with-log (error-response 400 "MFP" "Malformed params")
+                                               "Malformed params for CALCULATE request: %s, reason %s"
+                                               request-params
+                                               params-checking-result)
+        json-checking-result (return-with-log (error-response 400 "MFP" "Malformed body")
+                                             "Malformed body for CALCULATE request: %s, reason %s"
+                                             json-body
+                                             json-checking-result)
+        (not= model-id (:model_id json-body)) (return-with-log (error-response 400 "MFP" "Model ids mismatch in body and params")
+                                                              "Model ids mismatch in body and params")
+        (not= event-id (:event_id json-body)) (return-with-log (error-response 400 "MFP" "Event ids mismatch in body and params")
+                                                              "Event ids mismatch in body and params")
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+                                                                     "Invalid model id %d"
+                                                                     model-id)
+        :else (calculate-model-out-values session-store model-id event-id (:params json-body) profile?)))))
 
 
-(defn models-in-params-handler [{{storage :storage :as web}  :web
-                                 params :params}]
-  (let [{:keys [model-id ssid]} params
-        model-id (Integer/valueOf ^String model-id)]
-    (if (models/valid-model? storage model-id)
-      (let [session (session/create-or-prolong (:session-store web) model-id ssid)
-            workbook (:wb session)
-            in-sheet-name (:in_sheet_name session)
-            in-params (as-> workbook $
-                            (malx/get-sheet $ in-sheet-name)
-                            (map keywordize-keys $)
-                            (map #(update-in % [:id] long) $))]
-        (json/generate-string {:status 200
-                               :data   in-params}))
-      error-404-mnf)))
+(defn get-model-in-params [web model-id event-id]
+  (let [session (session/create-or-prolong (:session-store web) model-id event-id)]
+    (as-> (:wb session) $
+          (malx/get-sheet $ (:in_sheet_name session))
+          (map keywordize-keys $)
+          (map #(update-in % [:id] long) $))))
+
+(def in-params-handler-params-schema {:model-id s/Int
+                                      :event-id s/Str
+                                      s/Keyword s/Any})
+(defn in-params-handler [{{storage :storage :as web}  :web
+                          request-params :params}]
+  (let [params (update-in request-params [:model-id] try-string->int)
+        {:keys [model-id event-id]} params
+        params-checking-result (s/check in-params-handler-params-schema params)]
+    (response->json-response
+      (cond
+        params-checking-result (return-with-log (error-response 400 "MFP" "Malformed params")
+                                                "Malformed params for IN-PARAMS request: %s, reason %s"
+                                                request-params
+                                                params-checking-result)
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+                                                                      "Invalid model id %d"
+                                                                      model-id)
+        :else (success-response 200 (get-model-in-params web model-id event-id))))))
 
 (defn destroy-session [{{sstore :session-store} :web
-                        {ssid :ssid}            :params}]
-  ;; omg, ugliest code ever
-  (if-let [workbook-config (session/fetch sstore ssid)]
+                        {event-id :event-id}    :params}]
+  ;; ugly
+  (if-let [workbook-config (session/fetch sstore event-id)]
     (if (session/with-locked-workbook workbook-config
-                                      (session/delete! sstore ssid))
+                                      (session/delete! sstore event-id))
       {:status 204}
-      error-423-cip)
+      (response->json-response error-423-cip))
     {:status 204}))
-
-(defroutes routes
-  (GET "/models/:model-id/:ssid/in-params" req (models-in-params-handler req))
-  (POST "/models/:model-id/:ssid/profile" req (calc-handler req :profile? true))
-  (POST "/models/:model-id/:ssid/calculate" req (calc-handler req :profile? false))
-  (DELETE "/models/:model-id/:ssid" req (destroy-session req))
-  (ANY "/*" _ error-404-rnf))
 
 (defn wrap-with-web [h web]
   (fn [req]
@@ -109,7 +154,7 @@
       (h req)
       (catch Exception e
         (log/error e "while request handling")
-        error-500-ise))))
+        (response->json-response error-500-ise)))))
 
 (defn wrap-json-content-type [h]
   (fn [req]
@@ -117,6 +162,13 @@
         (h)
         (res/content-type "application/json")
         (res/charset "utf-8"))))
+
+(defroutes routes
+  (GET "/models/:model-id/:event-id/in-params" req (in-params-handler req))
+  (POST "/models/:model-id/:event-id/profile" req (calc-handler req :profile? true))
+  (POST "/models/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
+  (DELETE "/models/:model-id/:event-id" req (destroy-session req))
+  (ANY "/*" _ (response->json-response error-404-rnf)))
 
 (defn app [web]
   (-> routes
