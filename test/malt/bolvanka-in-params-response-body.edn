@@ -1,0 +1,63 @@
+{:status 200,
+ :data
+ [{:code "P_SCORE_A_PART_1",
+   :value 0.0,
+   :name "Score A Part 1",
+   :type "Parameter",
+   :id 1}
+  {:code "P_SCORE_B_PART_1",
+   :value 0.0,
+   :name "Score B Part 1",
+   :type "Parameter",
+   :id 2}
+  {:code "P_SCORE_A_PART_2",
+   :value 0.0,
+   :name "Score A Part 2",
+   :type "Parameter",
+   :id 3}
+  {:code "P_SCORE_B_PART_2",
+   :value 0.0,
+   :name "Score B Part 2",
+   :type "Parameter",
+   :id 4}
+  {:code "P_SCORE_A_PART_3",
+   :value 0.0,
+   :name "Score A Part 3",
+   :type "Parameter",
+   :id 5}
+  {:code "P_SCORE_B_PART_3",
+   :value 0.0,
+   :name "Score B Part 3",
+   :type "Parameter",
+   :id 6}
+  {:code "P_TIME", :value 0.0, :name "Time", :type "Parameter", :id 7}
+  {:code "P_HANDICAP",
+   :value -10.0,
+   :name "Handicap",
+   :type "Parameter",
+   :id 8}
+  {:code "P_TOTAL",
+   :value 150.0,
+   :name "Total",
+   :type "Parameter",
+   :id 9}
+  {:code "P_QUIRRELL_COEF",
+   :value 1.05,
+   :name "Quirrell coef",
+   :type "Parameter",
+   :id 10}
+  {:code "P_PROB_A",
+   :value 0.5,
+   :name "Prob A",
+   :type "Parameter",
+   :id 11}
+  {:code "P_PROB_B",
+   :value 0.5,
+   :name "Prob B",
+   :type "Parameter",
+   :id 12}
+  {:code "P_CHECK_BOX_099",
+   :value 0.0,
+   :name "Check box 0,99",
+   :type "Parameter",
+   :id 13}]}

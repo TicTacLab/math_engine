@@ -1,0 +1,17 @@
+{:model_id 1000,
+ :event_id
+ "5e36f29b-a37c-4cc2-8639-2a56afb09f62-1000-daa6b539-737b-4fe9-8d47-8b800364b593",
+ :params
+ ({:id "9", :value "150.0"}
+  {:id "3", :value "0.0"}
+  {:id "4", :value "0.0"}
+  {:id "8", :value "-10.0"}
+  {:id "7", :value "0.0"}
+  {:id "5", :value "0.0"}
+  {:id "12", :value "0.5"}
+  {:id "13", :value "0.0"}
+  {:id "6", :value "0.0"}
+  {:id "1", :value "0.0"}
+  {:id "11", :value "0.5"}
+  {:id "2", :value "0.0"}
+  {:id "10", :value "1.05"})}
