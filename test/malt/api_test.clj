@@ -112,9 +112,6 @@
              (response->status+result)
              (update-in [1] error-messages->blank)))
 
-      400 "MFP" bolvanka-model-id "1" bolvanka-model-id "2" bolvanka-calculate-request-body
-      400 "MFP" bolvanka-model-id "3" invalid-model-id "3" bolvanka-calculate-request-body
-      400 "MFP" bolvanka-model-id "5" (str bolvanka-model-id) "5" bolvanka-calculate-request-body
       400 "MFP" bolvanka-model-id "7" bolvanka-model-id "7" {}
       404 "MNF" invalid-model-id "6" invalid-model-id "6" bolvanka-calculate-request-body)))
 
