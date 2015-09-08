@@ -86,6 +86,7 @@
   (let [json-body (try-string->json (req/body-string req))
         {:keys [model-id event-id] :as params} (update-in request-params [:model-id] try-string->int)
         params-checking-result (s/check calc-handler-params-schema params)
+        json-body (assoc json-body :model_id model-id :event_id event-id)
         json-checking-result (s/check calc-handler-body-schema json-body)]
 
     (response->json-response
