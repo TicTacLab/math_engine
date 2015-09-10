@@ -1,15 +1,8 @@
 (defproject malt "1.0.0-SNAPSHOT"
   :description "REST FOR CAST EXCEL"
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [malcolmx "0.1.1-SNAPSHOT"]
-                 [com.betinvest/poi "3.11-20150430"]
+                 [malcolmx "0.1.1"]
                  [com.betinvest/noilly "0.1.4"]
-                 [org.apache.poi/poi-ooxml "3.11" :exclusions [org.apache.poi/poi]]
-                 [org.apache.poi/poi-ooxml-schemas "3.11" :exclusions [org.apache.poi/poi]]
-                 [commons-codec/commons-codec "1.9"]
-                 [org.apache.xmlbeans/xmlbeans "2.6.0"]
-                 [dom4j/dom4j "1.6.1"]
-                 [org.apache.commons/commons-math3 "3.1.1"]
                  [org.clojure/tools.trace "0.7.8"]
                  [org.slf4j/slf4j-api "1.7.12"]
                  [ch.qos.logback/logback-core "1.1.3"]
