@@ -40,12 +40,12 @@
       (swap! (fn [table]
                (if (cache/has? table ssid)
                  table
-                 (assoc table ssid
-                              (-> session-store
-                                  :storage
-                                  (models/get-model id)
-                                  config-to-workbook
-                                  (assoc :ssid ssid))))))
+                 (cache/miss table ssid
+                             (-> session-store
+                                 :storage
+                                 (models/get-model id)
+                                 config-to-workbook
+                                 (assoc :ssid ssid))))))
       (get ssid)))
 
 (defn delete! [session-store ssid]
