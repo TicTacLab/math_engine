@@ -8,8 +8,6 @@
                  [ch.qos.logback/logback-core "1.1.3"]
                  [ch.qos.logback/logback-classic "1.1.3"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [org.flatland/protobuf "0.8.1"]
-                 [com.google.protobuf/protobuf-java "2.5.0"]
                  [com.taoensso/nippy "2.9.0"]
                  [com.betinvest/zabbix-clojure-agent "0.1.8"]
                  [clojurewerkz/cassaforte "2.0.2"]
@@ -36,7 +34,6 @@
                                         :password :env}]]
 
   :plugins [[lein-ring "0.8.2"]
-            [lein-protobuf "0.4.1"]
             [lein-environ "1.0.0"]]
 
   :profiles {:dev  {:source-paths ["dev"]
