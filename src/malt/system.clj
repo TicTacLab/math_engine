@@ -10,15 +10,17 @@
 (defn new-system [config]
   (let [{:keys [monitoring-hostname zabbix-host zabbix-port]} config]
     (component/map->SystemMap
-      {:storage         (storage/new-storage config)
-       :session-store   (component/using
-                          (session/new-session-store config)
-                          [:storage])
-       :web             (component/using
-                          (w/new-web config)
-                          [:storage :session-store])
-       :zabbix-reporter (zabbix/new-zabbix-reporter
-                          {:hostname         monitoring-hostname
-                           :zabbix-host      zabbix-host
-                           :zabbix-port      zabbix-port
-                           :interval-minutes 1})})))
+      (merge
+        {:storage         (storage/new-storage config)
+         :session-store   (component/using
+                            (session/new-session-store config)
+                            [:storage])
+         :web             (component/using
+                            (w/new-web config)
+                            [:storage :session-store])}
+        (when zabbix-host
+          {:zabbix-reporter (zabbix/new-zabbix-reporter
+                              {:hostname         monitoring-hostname
+                               :zabbix-host      zabbix-host
+                               :zabbix-port      zabbix-port
+                               :interval-minutes 1})})))))
