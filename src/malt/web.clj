@@ -138,8 +138,7 @@
 (defn get-model-out-values-header [web model-id event-id]
   (let [session (session/create-or-prolong (:session-store web) model-id event-id)]
     (as-> (:wb session) $
-          (malx/get-sheet-header $ (:out_sheet_name session))
-          (>trace $))))
+          (malx/get-sheet-header $ (:out_sheet_name session)))))
 
 (def out-values-header-handler-params-schema {:model-id s/Int
                                       :event-id s/Str
