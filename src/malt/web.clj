@@ -135,6 +135,31 @@
                                                                       model-id)
         :else (success-response 200 (get-model-in-params web model-id event-id))))))
 
+(defn get-model-out-values-header [web model-id event-id]
+  (let [session (session/create-or-prolong (:session-store web) model-id event-id)]
+    (as-> (:wb session) $
+          (malx/get-sheet-header $ (:out_sheet_name session))
+          (>trace $))))
+
+(def out-values-header-handler-params-schema {:model-id s/Int
+                                      :event-id s/Str
+                                      s/Keyword s/Any})
+(defn out-values-header-handler [{{storage :storage :as web}  :web
+                          request-params :params}]
+  (let [params (update-in request-params [:model-id] try-string->int)
+        {:keys [model-id event-id]} params
+        params-checking-result (s/check out-values-header-handler-params-schema params)]
+    (response->json-response
+      (cond
+        params-checking-result (return-with-log (error-response 400 "MFP" "Malformed params")
+                                                "Malformed params for IN-PARAMS request: %s, reason %s"
+                                                request-params
+                                                params-checking-result)
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+                                                                      "Invalid model id %d"
+                                                                      model-id)
+        :else (success-response 200 (get-model-out-values-header web model-id event-id))))))
+
 (defn destroy-session [{{sstore :session-store} :web
                         {event-id :event-id}    :params}]
   (let [workbook-config (session/fetch sstore event-id)]
@@ -165,6 +190,7 @@
 
 (defroutes routes
   (GET "/models/:model-id/:event-id/in-params" req (in-params-handler req))
+  (GET "/models/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
   (POST "/models/:model-id/:event-id/profile" req (calc-handler req :profile? true))
   (POST "/models/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
   (DELETE "/models/:model-id/:event-id" req (destroy-session req))
