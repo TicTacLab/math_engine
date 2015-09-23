@@ -85,7 +85,7 @@ Returns IN-params for specified model. event-id and model-id couple should be un
 
 *Request example*
 
-```curl http://math.engine/model/120/72c361803a5b116e0682581fe958fdee/in-params```
+```curl http://math.engine/api/models/120/72c361803a5b116e0682581fe958fdee/in-params```
 
 ```
 Response 200 data example
@@ -195,7 +195,7 @@ Outcome's fields will be of type as specified in excel file.
 
 *Request example*
 
-```curl -X POST -d <<json-request-body>> http://math.engine/model/120/72c361803a5b116e0682581fe958fdee/calculate```
+```curl -X POST -d <<json-request-body>> http://math.engine/api/models/120/72c361803a5b116e0682581fe958fdee/calculate```
 
 *Response 200 data example*
 
@@ -252,4 +252,4 @@ Deallocates models resources for selected event.
 
 *Request example*
 
-```curl --request DELETE http://math.engine/model/120/754fbcde-662c-4b3f-9f51-acb4e67913da```
+```curl --request DELETE http://math.engine/api/models/120/754fbcde-662c-4b3f-9f51-acb4e67913da```
