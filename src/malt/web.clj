@@ -109,12 +109,16 @@
         :else (calculate-model-out-values session-store model-id event-id (:params json-body) profile?)))))
 
 
-(defn get-model-in-params [web model-id event-id]
-  (let [session (session/create-or-prolong (:session-store web) model-id event-id)]
-    (as-> (:wb session) $
-          (malx/get-sheet $ (:in_sheet_name session))
-          (map keywordize-keys $)
-          (map #(update-in % [:id] long) $))))
+(defn get-model-in-params [web model-id event-id plain?]
+  (let [session (session/create-or-prolong (:session-store web) model-id event-id)
+        workbook (:wb session)
+        header (malx/get-sheet-header workbook (:out_sheet_name session))
+        data (as-> workbook $
+                   (malx/get-sheet $ (:in_sheet_name session))
+                   (map #(update-in % ["id"] long) $))]
+    (if-not plain?
+      data
+      (concat [header] (mapv (fn [row] (mapv #(get row %) header)) data)))))
 
 (def in-params-handler-params-schema {:model-id s/Int
                                       :event-id s/Str
@@ -122,7 +126,8 @@
 (defn in-params-handler [{{storage :storage :as web}  :web
                           request-params :params}]
   (let [params (update-in request-params [:model-id] try-string->int)
-        {:keys [model-id event-id]} params
+        {:keys [model-id event-id plain]} params
+        plain? (Boolean/valueOf plain)
         params-checking-result (s/check in-params-handler-params-schema params)]
     (response->json-response
       (cond
@@ -133,7 +138,7 @@
         (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
                                                                       "Invalid model id %d"
                                                                       model-id)
-        :else (success-response 200 (get-model-in-params web model-id event-id))))))
+        :else (success-response 200 (get-model-in-params web model-id event-id plain?))))))
 
 (defn get-model-out-values-header [web model-id event-id]
   (let [session (session/create-or-prolong (:session-store web) model-id event-id)]
