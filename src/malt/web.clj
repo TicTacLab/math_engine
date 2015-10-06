@@ -193,11 +193,11 @@
         (res/charset "utf-8"))))
 
 (defroutes routes
-  (GET "/models/:model-id/:event-id/in-params" req (in-params-handler req))
-  (GET "/models/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
-  (POST "/models/:model-id/:event-id/profile" req (calc-handler req :profile? true))
-  (POST "/models/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
-  (DELETE "/models/:model-id/:event-id" req (destroy-session req))
+  (GET "/files/:model-id/:event-id/in-params" req (in-params-handler req))
+  (GET "/files/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
+  (POST "/files/:model-id/:event-id/profile" req (calc-handler req :profile? true))
+  (POST "/files/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
+  (DELETE "/files/:model-id/:event-id" req (destroy-session req))
   (ANY "/*" _ (response->json-response error-404-rnf)))
 
 (defn app [web]
