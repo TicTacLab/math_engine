@@ -32,7 +32,7 @@
   {:status (:status json)
    :body (json/generate-string json)})
 
-(def error-404-mnf (error-response 404 "MNF" "Model not found"))
+(def error-404-mnf (error-response 404 "FNF" "File not found"))
 (def error-404-rnf (error-response 404 "RNF" "Resource not found"))
 (def error-423-cip (error-response 423 "CIP" "Calculation is in progress"))
 (def error-500-ise (error-response 500 "ISE" "Internal server error"))
