@@ -64,7 +64,7 @@
       "should return json 404 error"))
 
 (deftest in-params
-  (is (= [404 web/error-404-mnf]
+  (is (= [404 web/error-404-fnf]
          (-> invalid-model-id
              (make-url (UUID/randomUUID) "/in-params")
              (http/get)

@@ -32,7 +32,7 @@
   {:status (:status json)
    :body (json/generate-string json)})
 
-(def error-404-mnf (error-response 404 "FNF" "File not found"))
+(def error-404-fnf (error-response 404 "FNF" "File not found"))
 (def error-404-rnf (error-response 404 "RNF" "Resource not found"))
 (def error-423-cip (error-response 423 "CIP" "Calculation is in progress"))
 (def error-500-ise (error-response 500 "ISE" "Internal server error"))
@@ -103,7 +103,7 @@
                                                               "Model ids mismatch in body and params")
         (not= event-id (:event_id json-body)) (return-with-log (error-response 400 "MFP" "Event ids mismatch in body and params")
                                                               "Event ids mismatch in body and params")
-        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-fnf
                                                                      "Invalid model id %d"
                                                                      model-id)
         :else (calculate-model-out-values session-store model-id event-id (:params json-body) profile?)))))
@@ -135,7 +135,7 @@
                                                 "Malformed params for IN-PARAMS request: %s, reason %s"
                                                 request-params
                                                 params-checking-result)
-        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-fnf
                                                                       "Invalid model id %d"
                                                                       model-id)
         :else (success-response 200 (get-model-in-params web model-id event-id plain?))))))
@@ -159,7 +159,7 @@
                                                 "Malformed params for IN-PARAMS request: %s, reason %s"
                                                 request-params
                                                 params-checking-result)
-        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-fnf
                                                                       "Invalid model id %d"
                                                                       model-id)
         :else (success-response 200 (get-model-out-values-header web model-id event-id))))))
