@@ -60,7 +60,7 @@
   value)
 
 (defn sessions-handler
-  [{:keys [session-store]}]
+  [{{:keys [session-store]} :web}]
   (response->json-response
     (success-response 200 (session/get-ids session-store))))
 
