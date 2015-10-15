@@ -173,11 +173,6 @@
       {:status 204}
       (response->json-response error-423-cip))))
 
-(defn health-check [{{sstore :session-store} :web}]
-  (if (session/can-create? sstore)
-    {:status 200}
-    {:status 400}))
-
 (defn wrap-with-web [h web]
   (fn [req]
     (h (assoc req :web web))))
@@ -203,7 +198,6 @@
   (POST "/files/:model-id/:event-id/profile" req (calc-handler req :profile? true))
   (POST "/files/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
   (DELETE "/files/:model-id/:event-id" req (destroy-session req))
-  (GET "/health-check" req (health-check req))
   (ANY "/*" _ (response->json-response error-404-rnf)))
 
 (defn app [web]

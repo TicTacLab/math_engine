@@ -35,11 +35,6 @@
   (swap! (get session-store :session-table) assoc ssid session)
   session)
 
-(defn can-create?
-  [{:keys [session-table session-max-count]}]
-  (< (count @session-table)
-     session-max-count))
-
 (defn create! [session-store id ssid]
   (-> (:session-table session-store)
       (swap! (fn [table]
@@ -66,7 +61,7 @@
     (create! session-store id ssid)))
 
 (defrecord SessionStore
-    [session-table session-ttl session-max-count storage sessions-count]
+    [session-table session-ttl storage sessions-count]
   ;; session-ttl in seconds
   component/Lifecycle
   (start [component]
@@ -83,8 +78,7 @@
       :sessions-count nil)))
 
 (def SessionStoreSchema
-  {:session-ttl s/Int
-   :session-max-count s/Int})
+  {:session-ttl s/Int})
 
 (defn new-session-store [m]
   (as-> m $
