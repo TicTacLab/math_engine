@@ -62,7 +62,7 @@
 (defn sessions-handler
   [{{:keys [session-store]} :web}]
   (response->json-response
-    (success-response 200 (session/get-ids session-store))))
+    (success-response 200 (vec (session/get-ids session-store)))))
 
 (defn calculate-model-out-values [session-store model-id event-id params profile?]
   (let [params (mapv coerce-params-fields params)] ;; FIXME: remove coersion?
