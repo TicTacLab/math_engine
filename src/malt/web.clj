@@ -59,6 +59,11 @@
   (log/info (apply format (cons msgf args)))
   value)
 
+(defn sessions-handler
+  [{:keys [session-store]}]
+  (response->json-response
+    (success-response 200 (session/get-ids session-store))))
+
 (defn calculate-model-out-values [session-store model-id event-id params profile?]
   (let [params (mapv coerce-params-fields params)] ;; FIXME: remove coersion?
     (if-let [result (calc session-store model-id event-id params profile?)]
@@ -193,6 +198,8 @@
         (res/charset "utf-8"))))
 
 (defroutes routes
+  (GET "/sessions" req (sessions-handler req))
+
   (GET "/files/:model-id/:event-id/in-params" req (in-params-handler req))
   (GET "/files/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
   (POST "/files/:model-id/:event-id/profile" req (calc-handler req :profile? true))
