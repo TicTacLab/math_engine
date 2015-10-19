@@ -210,7 +210,7 @@
 (defn wrap-trace
   [h]
   (fn [req]
-    (clojure.tools.trace/trace req)
+    (log/info req)
     (h req)))
 
 (defn app [web]
