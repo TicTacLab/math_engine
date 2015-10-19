@@ -207,13 +207,20 @@
   (DELETE "/files/:model-id/:event-id" req (destroy-session req))
   (ANY "/*" _ (response->json-response error-404-rnf)))
 
+(defn wrap-trace
+  [h]
+  (fn [req]
+    (clojure.tools.trace/trace req)
+    (h req)))
+
 (defn app [web]
   (-> routes
       (wrap-keyword-params)
       (wrap-params)
       (wrap-with-web web)
       (wrap-internal-server-error)
-      (wrap-json-content-type)))
+      (wrap-json-content-type)
+      (wrap-trace)))
 
 (defrecord Web [host port server storage api]
   component/Lifecycle
