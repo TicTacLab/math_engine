@@ -171,12 +171,8 @@
 
 (defn destroy-session [{{sstore :session-store} :web
                         {event-id :event-id}    :params}]
-  (let [workbook-config (session/fetch sstore event-id)]
-    (if (or (not workbook-config)
-            (session/with-locked-workbook workbook-config
-                                          (session/delete! sstore event-id)))
-      {:status 204}
-      (response->json-response error-423-cip))))
+  (let [deleted? (session/delete! sstore event-id)]
+    {:status 204}))
 
 (defn wrap-with-web [h web]
   (fn [req]

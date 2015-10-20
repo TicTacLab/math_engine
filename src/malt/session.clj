@@ -32,7 +32,10 @@
       (cache/lookup ssid)))
 
 (defn get-ids [session-store]
-  (keys @(:session-table session-store)))
+  (let [table @(:session-table session-store)]
+    (filter
+      #(cache/has? table %)
+      (keys table))))
 
 (defn prolong! [session-store ssid session]
   (swap! (get session-store :session-table) assoc ssid session)
@@ -54,9 +57,13 @@
 (defn delete! [session-store ssid]
   (let [workbook-config (fetch session-store ssid)]
     (swap! (:session-table session-store) cache/evict ssid)
-    (try (.close ^Workbook (:wb workbook-config))
-         (catch Exception _))
-    true))
+    (if (nil? workbook-config)
+      false
+      (with-locked-workbook workbook-config
+        (try
+          (.close ^Workbook (:wb workbook-config))
+          (catch Exception _)
+          (finally true))))))
 
 (defn create-or-prolong [session-store id ssid]
   (if-let [session (fetch session-store ssid)]
@@ -64,7 +71,7 @@
     (create! session-store id ssid)))
 
 (defrecord SessionStore
-    [session-table session-ttl storage sessions-count]
+  [session-table session-ttl storage sessions-count]
   ;; session-ttl in seconds
   component/Lifecycle
   (start [component]
