@@ -32,7 +32,7 @@
   {:status (:status json)
    :body (json/generate-string json)})
 
-(def error-404-mnf (error-response 404 "MNF" "Model not found"))
+(def error-404-fnf (error-response 404 "FNF" "File not found"))
 (def error-404-rnf (error-response 404 "RNF" "Resource not found"))
 (def error-423-cip (error-response 423 "CIP" "Calculation is in progress"))
 (def error-500-ise (error-response 500 "ISE" "Internal server error"))
@@ -103,7 +103,7 @@
                                                               "Model ids mismatch in body and params")
         (not= event-id (:event_id json-body)) (return-with-log (error-response 400 "MFP" "Event ids mismatch in body and params")
                                                               "Event ids mismatch in body and params")
-        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-fnf
                                                                      "Invalid model id %d"
                                                                      model-id)
         :else (calculate-model-out-values session-store model-id event-id (:params json-body) profile?)))))
@@ -130,7 +130,7 @@
                                                 "Malformed params for IN-PARAMS request: %s, reason %s"
                                                 request-params
                                                 params-checking-result)
-        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-fnf
                                                                       "Invalid model id %d"
                                                                       model-id)
         :else (success-response 200 (get-model-in-params web model-id event-id))))))
@@ -154,7 +154,7 @@
                                                 "Malformed params for IN-PARAMS request: %s, reason %s"
                                                 request-params
                                                 params-checking-result)
-        (not (models/valid-model? storage model-id)) (return-with-log error-404-mnf
+        (not (models/valid-model? storage model-id)) (return-with-log error-404-fnf
                                                                       "Invalid model id %d"
                                                                       model-id)
         :else (success-response 200 (get-model-out-values-header web model-id event-id))))))
@@ -188,11 +188,11 @@
         (res/charset "utf-8"))))
 
 (defroutes routes
-  (GET "/models/:model-id/:event-id/in-params" req (in-params-handler req))
-  (GET "/models/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
-  (POST "/models/:model-id/:event-id/profile" req (calc-handler req :profile? true))
-  (POST "/models/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
-  (DELETE "/models/:model-id/:event-id" req (destroy-session req))
+  (GET "/files/:model-id/:event-id/in-params" req (in-params-handler req))
+  (GET "/files/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
+  (POST "/files/:model-id/:event-id/profile" req (calc-handler req :profile? true))
+  (POST "/files/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
+  (DELETE "/files/:model-id/:event-id" req (destroy-session req))
   (ANY "/*" _ (response->json-response error-404-rnf)))
 
 (defn app [web]
