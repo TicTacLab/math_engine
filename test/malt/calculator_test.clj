@@ -8,7 +8,7 @@
             [malt.config :as c]))
 
 (deftest calc-test
-  (let [sys (component/start (s/new-system @c/config))]
+  (let [sys (component/start (s/new-system (c/config)))]
     (try
       (let [session-store (:session-store sys)
             workbook-config (sess/config-to-workbook {:file           (io/file "test/malt/test-model.xls")

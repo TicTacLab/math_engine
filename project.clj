@@ -1,5 +1,9 @@
 (defproject malt "1.0.0-SNAPSHOT"
   :description "REST FOR CAST EXCEL"
+  :omit-source true
+  :uberjar-exclusions [#"logback.xml" #"logback.production.xml"]
+  :uberjar-name "math_engine_standalone.jar"
+  :main malt.main
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [malcolmx "0.1.4"]
                  [com.betinvest/noilly "0.1.4"]
@@ -24,7 +28,6 @@
 
   :repl-options {:timeout 120000
                  :init-ns user}
-  :uberjar-name "malt-standalone.jar"
   :jvm-opts ["-Dlogback.configurationFile=logback.xml"]
   :repositories ^:replace [["snapshots" {:url "http://52.28.244.218:8080/repository/snapshots"
                                          :username :env
@@ -57,5 +60,4 @@
                                               [clojure.pprint pprint]
                                               [clojure.tools.trace trace]
                                               [criterium.core bench])]}
-             :test {:dependencies [[http-kit "2.1.18"]]}}
-  :main malt.main)
+             :test {:dependencies [[http-kit "2.1.18"]]}})

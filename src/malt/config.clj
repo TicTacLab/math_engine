@@ -1,4 +1,16 @@
 (ns malt.config
   (:require [cheshire.core :as json]))
 
-(def config (atom (json/parse-string (slurp "config.json") true)))
+(def cfg (atom nil))
+
+(defn load-config []
+  (let [file-path (or (System/getProperty "math_engine.config_file")
+                      "config.json")]
+    (reset! cfg (json/parse-string (slurp file-path) true))))
+
+(defn config []
+  (if-let [c @cfg]
+    c
+    (do
+      (load-config)
+      @cfg)))

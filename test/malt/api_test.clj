@@ -18,7 +18,7 @@
 (def system nil)
 
 (defn start-system []
-  (alter-var-root #'system (constantly (s/new-system @c/config)))
+  (alter-var-root #'system (constantly (s/new-system (c/config))))
   (alter-var-root #'system component/start))
 
 (defn stop-system []
@@ -35,7 +35,7 @@
 
 (defn make-url [model-id ssid action]
   (format "http://localhost:%s/models/%s/%s%s"
-          (:port @c/config)
+          (:port (c/config))
           model-id
           ssid
           action))
