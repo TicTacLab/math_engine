@@ -12,6 +12,7 @@
 (defn -main [& _args]
   (try
     (swap! system #(if % % (component/start (s/new-system (c/config)))))
+    (println "MathEngine is started!")
     (catch Exception e
       (log/error e "Exception during startup. Fix configuration and
                     start application using REST configuration interface")))
