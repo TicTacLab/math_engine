@@ -2,13 +2,13 @@
 
 <configuration>
     <appender name="R" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>/var/log/malt_engine/malt_engine.log</File>
+        <File>${BASE_DIR}/log/malt_engine.log</File>
         <encoder>
             <pattern>%5p | %d | [%t] ||| %m%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <maxHistory>3</maxHistory>
-            <FileNamePattern>/var/log/malt_engine/malt_engine.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${BASE_DIR}/log/malt_engine.%d{yyyy-MM-dd}.log</FileNamePattern>
         </rollingPolicy>
     </appender>
 
