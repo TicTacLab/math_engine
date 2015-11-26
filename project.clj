@@ -4,6 +4,7 @@
   :uberjar-exclusions [#"logback.xml" #"logback.production.xml"]
   :uberjar-name "math_engine_standalone.jar"
   :main malt.main
+  :aot :all
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [malcolmx "0.1.4"]
                  [com.betinvest/noilly "0.1.4"]
@@ -19,7 +20,7 @@
                  [prismatic/schema "1.0.1"]
                  [cheshire "5.5.0"]
                  [javax.servlet/javax.servlet-api "3.1.0"]
-                 [compojure "1.2.0"]
+                 [compojure "1.4.0"]
                  [ring "1.4.0"]
                  [dire "0.5.3"]
                  [org.clojure/core.cache "0.6.4"]]
