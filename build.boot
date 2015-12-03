@@ -31,7 +31,6 @@
                  [ring "1.4.0"]
                  [dire "0.5.3"]
                  [org.clojure/core.cache "0.6.4"]]
- :dev-dependencies '[[com.cemerick/pomegranate "0.3.0"]]
  :build-dependencies '[[org.codehaus.groovy/groovy-all "2.4.5"]
                        [javax.mail/javax.mail-api "1.5.4"]
                        [javax.jms/jms-api "1.1-rev-1"]
@@ -65,11 +64,6 @@
                        [javax.portlet/portlet-api "2.0"]
                        [org.osgi/org.osgi.core "4.3.0"]])
 
-(deftask dev "Add some dev dependencies for project"
-         []
-         (set-env! :dependencies #(into % (get-env :dev-dependencies)))
-         identity)
-
 (deftask prod "Add some prod dependencies for build"
          []
          (set-env! :dependencies #(into % (get-env :build-dependencies)))
@@ -79,11 +73,12 @@
   "Builds an uberjar of this project that can be run with java -jar"
   []
   (comp
-   (aot :all true)
-   (pom :project 'malt
-        :version "1.0.0")
-   (uber :exclude #{#"(?i)^META-INF/INDEX.LIST$"
-       #"(?i)^META-INF/[^/]*\.(MF|SF|RSA|DSA)$"
-       #"clj$"})
-   (jar :file "malt-1.0.0.jar"
-        :main 'malt.main)))
+    (prod)
+    (aot :all true)
+    (pom :project 'malt
+         :version "1.0.0")
+    (uber :exclude #{#"(?i)^META-INF/INDEX.LIST$"
+                     #"(?i)^META-INF/[^/]*\.(MF|SF|RSA|DSA)$"
+                     #"clj$"})
+    (jar :file "malt-1.0.0.jar"
+         :main 'malt.main)))
