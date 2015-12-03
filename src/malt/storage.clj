@@ -3,7 +3,7 @@
             [schema.core :as s]
             [metrics.core :as metrics]
             [metrics.meters :as meter]
-            [zabbix-clojure-agent.gauges :as agauge]
+            #_[zabbix-clojure-agent.gauges :as agauge]
             [clojurewerkz.cassaforte.client :as cc]
             [clojurewerkz.cassaforte.policies :as cp]
             [clojure.tools.logging :as log])
@@ -49,9 +49,10 @@
         :conn conn
         :hits hits
         :calls calls
-        :cache-hit (agauge/ratio-gauge-fn ["malt_engine" "cache_hit"]
-                                          #(RatioGauge$Ratio/of (meter/rate-one hits)
-                                                                (meter/rate-one calls))))))
+        :cache-hit nil
+        #_(agauge/ratio-gauge-fn ["malt_engine" "cache_hit"]
+                               #(RatioGauge$Ratio/of (meter/rate-one hits)
+                                                     (meter/rate-one calls))))))
 
   (stop [component]
     (when conn

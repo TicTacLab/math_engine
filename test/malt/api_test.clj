@@ -34,7 +34,7 @@
       (stop-system))))
 
 (defn make-url [model-id ssid action]
-  (format "http://localhost:%s/models/%s/%s%s"
+  (format "http://localhost:%s/files/%s/%s%s"
           (:port (c/config))
           model-id
           ssid
@@ -113,7 +113,7 @@
              (update-in [1] error-messages->blank)))
 
       400 "MFP" bolvanka-model-id "7" bolvanka-model-id "7" {}
-      404 "MNF" invalid-model-id "6" invalid-model-id "6" bolvanka-calculate-request-body)))
+      404 "FNF" invalid-model-id "6" invalid-model-id "6" bolvanka-calculate-request-body)))
 
 (deftest profile-method
   (let [event-id (UUID/randomUUID)]

@@ -1,7 +1,7 @@
 (ns malt.system
   (:require
     [com.stuartsierra.component :as component]
-    [zabbix-clojure-agent.core :as zabbix]
+    #_[zabbix-clojure-agent.core :as zabbix]
     [clojure.string :refer (split)]
     [malt.session :as session]
     [malt.storage :as storage]
@@ -18,7 +18,7 @@
          :web             (component/using
                             (w/new-web config)
                             [:storage :session-store])}
-        (when zabbix-host
+        #_(when zabbix-host
           {:zabbix-reporter (zabbix/new-zabbix-reporter
                               {:hostname         monitoring-hostname
                                :zabbix-host      zabbix-host
