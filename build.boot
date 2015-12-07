@@ -62,9 +62,13 @@
                        [org.jboss.logging/jboss-logging "3.3.0.Final"]
                        [org.osgi/org.osgi.enterprise "4.2.0"]
                        [javax.portlet/portlet-api "2.0"]
-                       [org.osgi/org.osgi.core "4.3.0"]])
+                       [org.osgi/org.osgi.core "4.3.0"]
+                       [javax.annotation/jsr250-api "1.0"]
+                       [javax.enterprise/cdi-api "1.0-SP1"]
+                       [javax.inject/javax.inject "1"]
+                       ])
 
-(deftask prod "Add some prod dependencies for build"
+(deftask compile-deps "Add some prod dependencies for build"
          []
          (set-env! :dependencies #(into % (get-env :build-dependencies)))
          identity)
@@ -73,12 +77,13 @@
   "Builds an uberjar of this project that can be run with java -jar"
   []
   (comp
-    (prod)
     (aot :all true)
-    (pom :project 'malt
+    (pom :project 'malt-engine
          :version "1.0.0")
     (uber :exclude #{#"(?i)^META-INF/INDEX.LIST$"
                      #"(?i)^META-INF/[^/]*\.(MF|SF|RSA|DSA)$"
-                     #"clj$"})
-    (jar :file "malt-1.0.0.jar"
+                     #"clj$"
+                     ;; zellix klassmaster breaks when class hash DASH in his name
+                     #"Compressable-LZMA2"})
+    (jar :file "malt-engine-1.0.0.jar"
          :main 'malt.main)))

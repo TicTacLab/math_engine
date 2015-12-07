@@ -40,12 +40,21 @@ classpath   "%java.home%/lib/resources.jar"
             "%user.home%/.m2/repository/org/jboss/logging/jboss-logging/3.3.0.Final/jboss-logging-3.3.0.Final.jar"
             "%user.home%/.m2/repository/org/osgi/org.osgi.enterprise/4.2.0/org.osgi.enterprise-4.2.0.jar"
             "%user.home%/.m2/repository/javax/portlet/portlet-api/2.0/portlet-api-2.0.jar"
-            "%user.home%/.m2/repository/org/osgi/org.osgi.core/4.3.0/org.osgi.core-4.3.0.jar";
+            "%user.home%/.m2/repository/org/osgi/org.osgi.core/4.3.0/org.osgi.core-4.3.0.jar"
+            ;
 open        "target/malt-1.0.0.jar";
 
-fixedClasses clojure.* and clojure.*.* and clojure.*.*.* and clojure.asm.* and clojure.core_proxy.*  and
-             malt.main* and com.datastax.driver.*.*;
 exclude     malt.^main^ public static main(java.lang.String[]) and
+            clojure*.^* and
+            clojure*.^* * and
+            clojure*.^* *(*) and
+            com.datastax*.^* and
+            com.datastax*.^* * and
+            com.datastax*.^* *(*) and
+            io.netty*.^* and
+            javax.servlet*.^* and
+            javax.servlet*.^* * and
+            javax.servlet*.^* *(*) and
             *.^*__init and
             net.jpountz.lz4.^* and
             net.jpountz.lz4.^* INSTANCE and
@@ -60,22 +69,24 @@ exclude     malt.^main^ public static main(java.lang.String[]) and
             schemaorg_apache_xmlbeans*.^* and
             schemaorg_apache_xmlbeans*.^* * and
             schemaorg_apache_xmlbeans*.^* *(*);
-            
+
+obfuscateFlowExclude clojure*.* and com.datastax*.* and javax*.* and malcolmx*.*;
+
 accessedByReflection *.* extends org.apache.poi.POIXMLRelation and
                      *.* implements org.apache.poi.ss.usermodel.Cell setCellValue(*);
 
 obfuscate   changeLogFileIn=""
             changeLogFileOut="ChangeLog.txt"
-            obfuscateFlow=none //light
+            obfuscateFlow=light
             exceptionObfuscation=none //light
             encryptStringLiterals=none
             mixedCaseClassNames=false
             aggressiveMethodRenaming=false //true
             collapsePackagesWithDefault=""
-            localVariables=keep //delete
-            lineNumbers=keep //delete
+            localVariables=delete
+            lineNumbers=scramble
             autoReflectionHandling=normal
             obfuscateReferences=none
             obfuscateReferenceStructures=inSpecialClass;
 
-saveAll     archiveCompression=all "target/math-engine-1.0.0.jar";
+saveAll     archiveCompression=all "target/math-engine-1.0.0.final.jar";
