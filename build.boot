@@ -13,7 +13,7 @@
                              :releases true
                             :snapshots false}
                 "central" "http://repo1.maven.org/maven2/"}
- :uberjar-name "malt-engine.jar"
+ :uberjar-name "malt_engine.jar"
 
  :build-dependencies '[[org.codehaus.groovy/groovy-all "2.4.5"]
                        [javax.mail/javax.mail-api "1.5.4"]
@@ -78,7 +78,7 @@
                (s/sh "java"
                      (str "-Dobfuscator.infile=" (.getAbsolutePath (tmp-file out-file)))
                      (str "-Dobfuscator.outdir=" (.getAbsolutePath tmp))
-                     (str "-Dobfuscator.outfile=math-engine.final.jar")
+                     (str "-Dobfuscator.outfile=math_engine.final.jar")
                      "-jar" "obfuscator/ZKM.jar" "obfuscator/script.txt"))
 
              (-> fileset
