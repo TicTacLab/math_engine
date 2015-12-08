@@ -73,17 +73,22 @@
          (let [uberjar-name (get-env :uberjar-name)
                tmp (tmp-dir!)]
            (with-pre-wrap fileset
-             (let [out-file (first (by-name #{uberjar-name} (output-files fileset)))]
-               (boot.util/info "Obfuscating %s...\n" uberjar-name)
-               (s/sh "java"
-                     (str "-Dobfuscator.infile=" (.getAbsolutePath (tmp-file out-file)))
-                     (str "-Dobfuscator.outdir=" (.getAbsolutePath tmp))
-                     (str "-Dobfuscator.outfile=math_engine.final.jar")
-                     "-jar" "obfuscator/ZKM.jar" "obfuscator/script.txt"))
-
-             (-> fileset
-                 (add-resource tmp)
-                 commit!))))
+                          (let [out-file (first (by-name #{uberjar-name} (output-files fileset)))]
+                            (boot.util/info "Obfuscating %s...\n" uberjar-name)
+                            (let [{:keys [err exit]}
+                                  (s/sh "java"
+                                        (str "-Xmx500M")
+                                        (str "-Dobfuscator.infile=" (.getAbsolutePath (tmp-file out-file)))
+                                        (str "-Dobfuscator.outdir=" (.getAbsolutePath tmp))
+                                        (str "-Dobfuscator.outfile=math_engine.final.jar")
+                                        "-jar" "obfuscator/ZKM.jar" "obfuscator/script.txt")]
+                              (if-not (zero? exit)
+                                (do
+                                  (boot.util/fail "Error during obfuscating: %s" err)
+                                  (System/exit exit))
+                                (-> fileset
+                                    (add-resource tmp)
+                                    commit!)))))))
 
 (deftask build
   "Builds an uberjar of this project that can be run with java -jar"
