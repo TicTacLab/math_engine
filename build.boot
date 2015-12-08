@@ -1,3 +1,5 @@
+(require '[clojure.java.shell :as s])
+
 (set-env!
  :source-paths #{"src"}
  :repositories {"snapshots" {:url      "http://52.28.244.218:8080/repository/snapshots"
@@ -11,26 +13,8 @@
                              :releases true
                             :snapshots false}
                 "central" "http://repo1.maven.org/maven2/"}
- :dependencies '[[org.clojure/clojure "1.8.0-RC3"]
-                 [malcolmx "0.1.5"]
-                 [com.betinvest/noilly "0.1.4"]
-                 [org.clojure/tools.trace "0.7.8"]
-                 [org.slf4j/slf4j-api "1.7.12"]
-                 [ch.qos.logback/logback-core "1.1.3"]
-                 [ch.qos.logback/logback-classic "1.1.3"]
-                 [org.clojure/tools.logging "0.3.1"]
-                 [com.taoensso/nippy "2.9.0"]
-                 [metrics-clojure "2.4.0"]
-                 ;[com.betinvest/zabbix-clojure-agent "0.1.8"]
-                 [clojurewerkz/cassaforte "2.0.2"]
-                 [com.stuartsierra/component "0.2.3"]
-                 [prismatic/schema "1.0.1"]
-                 [cheshire "5.5.0"]
-                 [javax.servlet/javax.servlet-api "3.1.0"]
-                 [compojure "1.4.0"]
-                 [ring "1.4.0"]
-                 [dire "0.5.3"]
-                 [org.clojure/core.cache "0.6.4"]]
+ :uberjar-name "malt-engine.jar"
+
  :build-dependencies '[[org.codehaus.groovy/groovy-all "2.4.5"]
                        [javax.mail/javax.mail-api "1.5.4"]
                        [javax.jms/jms-api "1.1-rev-1"]
@@ -65,13 +49,41 @@
                        [org.osgi/org.osgi.core "4.3.0"]
                        [javax.annotation/jsr250-api "1.0"]
                        [javax.enterprise/cdi-api "1.0-SP1"]
-                       [javax.inject/javax.inject "1"]
-                       ])
+                       [javax.inject/javax.inject "1"]])
 
-(deftask compile-deps "Add some prod dependencies for build"
+(defn set-dependencies! []
+  (let [project (read-string (slurp "project.clj"))
+        deps (->> project
+                  (drop 3)
+                  (apply hash-map)
+                  :dependencies)]
+    (set-env! :dependencies deps)))
+
+(set-dependencies!)
+
+(deftask fetch-obfuscating-deps
+         "Add some obfuscating dependencies for build"
          []
          (set-env! :dependencies #(into % (get-env :build-dependencies)))
          identity)
+
+(deftask obfuscate
+         "Obfuscates jar using KlassMaster"
+         []
+         (let [uberjar-name (get-env :uberjar-name)
+               tmp (tmp-dir!)]
+           (with-pre-wrap fileset
+             (let [out-file (first (by-name #{uberjar-name} (output-files fileset)))]
+               (boot.util/info "Obfuscating %s...\n" uberjar-name)
+               (s/sh "java"
+                     (str "-Dobfuscator.infile=" (.getAbsolutePath (tmp-file out-file)))
+                     (str "-Dobfuscator.outdir=" (.getAbsolutePath tmp))
+                     (str "-Dobfuscator.outfile=math-engine.final.jar")
+                     "-jar" "obfuscator/ZKM.jar" "obfuscator/script.txt"))
+
+             (-> fileset
+                 (add-resource tmp)
+                 commit!))))
 
 (deftask build
   "Builds an uberjar of this project that can be run with java -jar"
@@ -85,5 +97,6 @@
                      #"clj$"
                      ;; zellix klassmaster breaks when class hash DASH in his name
                      #"Compressable-LZMA2"})
-    (jar :file "malt-engine-1.0.0.jar"
-         :main 'malt.main)))
+    (jar :file (get-env :uberjar-name)
+         :main 'malt.main)
+    (obfuscate)))
