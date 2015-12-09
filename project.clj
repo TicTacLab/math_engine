@@ -5,7 +5,7 @@
   :uberjar-name "math_engine_standalone.jar"
   :main malt.main
   :dependencies [[org.clojure/clojure "1.8.0-RC3"]
-                 [malcolmx "0.1.7"]
+                 [malcolmx "0.1.8"]
                  [com.betinvest/noilly "0.1.4"]
                  [org.clojure/tools.trace "0.7.8"]
                  [org.slf4j/slf4j-api "1.7.12"]
