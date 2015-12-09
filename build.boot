@@ -77,11 +77,13 @@
                             (boot.util/info "Obfuscating %s...\n" uberjar-name)
                             (let [{:keys [err exit]}
                                   (s/sh "java"
-                                        (str "-Xmx500M")
+                                        #_"-Xmx1g"
                                         (str "-Dobfuscator.infile=" (.getAbsolutePath (tmp-file out-file)))
                                         (str "-Dobfuscator.outdir=" (.getAbsolutePath tmp))
                                         (str "-Dobfuscator.outfile=math_engine.final.jar")
-                                        "-jar" "obfuscator/ZKM.jar" "obfuscator/script.txt")]
+                                        "-jar" "obfuscator/ZKM.jar"
+                                        "-l"
+                                        "obfuscator/script.txt")]
                               (if-not (zero? exit)
                                 (do
                                   (boot.util/fail "Error during obfuscating: %s" err)
