@@ -69,7 +69,10 @@ exclude     malt.^main^ public static main(java.lang.String[]) and
             schemasMicrosoftComOfficeOffice*.^* and
             schemaorg_apache_xmlbeans*.^* and
             schemaorg_apache_xmlbeans*.^* * and
-            schemaorg_apache_xmlbeans*.^* *(*);
+            schemaorg_apache_xmlbeans*.^* *(*) and
+            lamina*.^* and
+            lamina*.^* * and
+            lamina*.^* *(*);
 
 obfuscateFlowExclude clojure*.* and com.datastax*.* and javax*.* and malcolmx*.*;
 

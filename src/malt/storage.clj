@@ -3,7 +3,7 @@
             [schema.core :as s]
             [metrics.core :as metrics]
             [metrics.meters :as meter]
-            #_[zabbix-clojure-agent.gauges :as agauge]
+            [zabbix-clojure-agent.gauges :as agauge]
             [clojurewerkz.cassaforte.client :as cc]
             [clojurewerkz.cassaforte.policies :as cp]
             [clojure.tools.logging :as log])
@@ -43,14 +43,13 @@
                                                          :password storage-password}
                                    :reconnection-policy (cp/constant-reconnection-policy 100)})
           hits (meter/meter "hits")
-          calls (meter/meter "calls")]
+          calls (meter/meter ["math_engine" "calls_rate"])]
       (log/info "Storage started")
       (assoc component
         :conn conn
         :hits hits
         :calls calls
-        :cache-hit nil
-        #_(agauge/ratio-gauge-fn ["malt_engine" "cache_hit"]
+        :cache-hit (agauge/ratio-gauge-fn ["malt_engine" "cache_hit"]
                                #(RatioGauge$Ratio/of (meter/rate-one hits)
                                                      (meter/rate-one calls))))))
 

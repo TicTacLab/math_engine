@@ -8,10 +8,6 @@ DIST_DIR="target/${DIST_NAME}"
 
 BOOT_JVM_OPTIONS='-Xmx2g'
 
-echo "Add git tag ${VERSION}"
-git tag ${VERSION}
-git push --tags
-
 echo "Building..."
 ./boot fetch-obfuscating-deps
 ./boot build
@@ -36,6 +32,10 @@ chmod +x ${DIST_DIR}/bin/math_engine.sh
 echo "Creating zip file..."
 cd target && zip -r ${DIST_NAME}.zip ${DIST_NAME} && cd -
 
+echo "Add git tag ${VERSION}"
+git tag ${VERSION}
+git push --tags
+
 echo "Pushing release into s3..."
 aws s3 cp --region eu-central-1 \
     target/${DIST_NAME}.zip \
@@ -43,7 +43,7 @@ aws s3 cp --region eu-central-1 \
 
 echo "Pushing changelog into s3..."
 aws s3 cp --region eu-central-1 \
-    target/ChangeLog.txt \
+    ChangeLog.txt \
     s3://com.betengines.obfuscation.changelog/math_engine/ChangeLog-${VERSION}.txt
 
 echo "Done"
