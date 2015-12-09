@@ -82,7 +82,6 @@
                                         (str "-Dobfuscator.outdir=" (.getAbsolutePath tmp))
                                         (str "-Dobfuscator.outfile=math_engine.final.jar")
                                         "-jar" "obfuscator/ZKM.jar"
-                                        "-l"
                                         "obfuscator/script.txt")]
                               (if-not (zero? exit)
                                 (do

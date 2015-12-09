@@ -39,7 +39,7 @@ aws s3 cp --region eu-central-1 \
 
 echo "Pushing changelog into s3..."
 aws s3 cp --region eu-central-1 \
-    ChangeLog.txt \
+    target/ChangeLog.txt \
     s3://com.betengines.obfuscation.changelog/math_engine/ChangeLog-${VERSION}.txt
 
 echo "Done"
