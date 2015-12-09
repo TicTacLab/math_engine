@@ -8,6 +8,10 @@ DIST_DIR="target/${DIST_NAME}"
 
 BOOT_JVM_OPTIONS='-Xmx2g'
 
+echo "Add git tag ${VERSION}"
+git tag ${VERSION}
+git push --tags
+
 echo "Building..."
 ./boot fetch-obfuscating-deps
 ./boot build
