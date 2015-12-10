@@ -57,6 +57,9 @@ exclude     malt.^main^ public static main(java.lang.String[]) and
             javax.servlet*.^* * and
             javax.servlet*.^* *(*) and
             *.^*__init and
+            ch.qos.logback*.^* and
+            ch.qos.logback*.^* * and
+            ch.qos.logback*.^* *(*) and
             net.jpountz.lz4.^* and
             net.jpountz.lz4.^* INSTANCE and
             org.openxmlformats.schemas*.^* and
