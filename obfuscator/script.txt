@@ -80,7 +80,9 @@ exclude     malt.^main^ public static main(java.lang.String[]) and
 obfuscateFlowExclude clojure*.* and com.datastax*.* and javax*.* and malcolmx*.*;
 
 accessedByReflection *.* extends org.apache.poi.POIXMLRelation and
-                     *.* implements org.apache.poi.ss.usermodel.Cell setCellValue(*);
+                     *.* implements org.apache.poi.ss.usermodel.Cell setCellValue(*) and
+                     *.* extends org.apache.poi.hssf.record.RecordBase * and
+                     *.* extends org.apache.poi.hssf.record.RecordBase *(*);
 
 obfuscate   changeLogFileIn=""
             changeLogFileOut="ChangeLog.txt"
