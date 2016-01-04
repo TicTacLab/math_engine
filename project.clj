@@ -44,7 +44,7 @@
   :profiles {:dev  {:source-paths ["dev"]
                     :global-vars  {*warn-on-reflection* false}
                     :dependencies [[ns-tracker "0.3.0"]
-                                   [malcolmx "0.1.7"]
+                                   [malcolmx "0.1.8"]
                                    [aprint "0.1.3"]
                                    [http-kit.fake "0.2.2"]
                                    [http-kit "2.1.18"]
