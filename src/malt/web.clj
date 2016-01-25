@@ -1,5 +1,5 @@
 (ns malt.web
-  (:require [compojure.core :refer (defroutes ANY GET POST PUT DELETE wrap-routes)]
+  (:require [compojure.core :refer (defroutes ANY GET POST PUT DELETE OPTIONS wrap-routes)]
             [schema.core :as s]
             [ring.adapter.jetty :as jetty]
             [com.stuartsierra.component :as component]
@@ -192,14 +192,26 @@
         (res/content-type "application/json")
         (res/charset "utf-8"))))
 
+(defn allow-cors []
+  {})
+
 (defroutes routes
   (GET "/sessions" req (sessions-handler req))
   (GET "/files/:model-id/:event-id/in-params" req (in-params-handler req))
   (GET "/files/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
   (POST "/files/:model-id/:event-id/profile" req (calc-handler req :profile? true))
   (POST "/files/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
+  (OPTIONS "/files/:model-id/:event-id/calculate" req (allow-cors))
   (DELETE "/files/:model-id/:event-id" req (destroy-session req))
+  (OPTIONS "/files/:model-id/:event-id" req (allow-cors))
   (ANY "/*" _ (response->json-response error-404-rnf)))
+
+(defn wrap-cors [h]
+  (fn [req]
+    (-> (h req)
+        (res/header "Access-Control-Allow-Origin" "*")
+        (res/header "Access-Control-Allow-Methods" "POST, DELETE")
+        (res/header "Access-Control-Allow-Headers" "content-type"))))
 
 (defn app [web]
   (-> routes
@@ -207,7 +219,8 @@
       (wrap-params)
       (wrap-with-web web)
       (wrap-internal-server-error)
-      (wrap-json-content-type)))
+      (wrap-json-content-type)
+      (wrap-cors)))
 
 (defrecord Web [host port server storage api]
   component/Lifecycle
