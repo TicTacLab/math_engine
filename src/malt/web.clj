@@ -159,6 +159,11 @@
                                                                       model-id)
         :else (success-response 200 (get-model-out-values-header web model-id event-id))))))
 
+(defn sessions-handler
+  [{{:keys [session-store]} :web}]
+  (response->json-response
+    (success-response 200 (vec (session/get-ids session-store)))))
+
 (defn destroy-session [{{sstore :session-store} :web
                         {event-id :event-id}    :params}]
   (let [workbook-config (session/fetch sstore event-id)]
@@ -188,6 +193,7 @@
         (res/charset "utf-8"))))
 
 (defroutes routes
+  (GET "/sessions" req (sessions-handler req))
   (GET "/files/:model-id/:event-id/in-params" req (in-params-handler req))
   (GET "/files/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
   (POST "/files/:model-id/:event-id/profile" req (calc-handler req :profile? true))

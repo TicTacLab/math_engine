@@ -60,6 +60,12 @@
     (prolong! session-store ssid session)
     (create! session-store id ssid)))
 
+(defn get-ids [session-store]
+  (let [table @(:session-table session-store)]
+    (filter
+      #(cache/has? table %)
+      (keys table))))
+
 (defrecord SessionStore
     [session-table session-ttl storage sessions-count]
   ;; session-ttl in seconds
