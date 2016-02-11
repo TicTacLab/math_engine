@@ -8,7 +8,8 @@
             [clojurewerkz.cassaforte.policies :as cp]
             [clojure.tools.logging :as log])
   (:import [com.codahale.metrics RatioGauge$Ratio]
-           [com.datastax.driver.core.exceptions NoHostAvailableException]))
+           [com.datastax.driver.core.exceptions NoHostAvailableException]
+           (com.datastax.driver.core.policies DCAwareRoundRobinPolicy)))
 
 
 (defn try-connect-times [times delay-ms nodes keyspace opts]
@@ -28,6 +29,7 @@
                     storage-keyspace
                     storage-user
                     storage-password
+                    storage-default-dc
                     cache-hit
                     hits
                     calls
@@ -39,9 +41,10 @@
                                   1000
                                   storage-nodes
                                   storage-keyspace
-                                  {:credentials         {:username storage-user
-                                                         :password storage-password}
-                                   :reconnection-policy (cp/constant-reconnection-policy 100)})
+                                  {:credentials           {:username storage-user
+                                                           :password storage-password}
+                                   :reconnection-policy   (cp/constant-reconnection-policy 100)
+                                   :load-balancing-policy (DCAwareRoundRobinPolicy. storage-default-dc 2)})
           hits (meter/meter "hits")
           calls (meter/meter ["math_engine" "calls_rate"])]
       (log/info "Storage started")
@@ -72,6 +75,7 @@
    :storage-keyspace s/Str
    :storage-user     s/Str
    :storage-password s/Str
+   :storage-default-dc s/Str
    :cache-on         s/Bool})
 
 (defn new-storage [m]
