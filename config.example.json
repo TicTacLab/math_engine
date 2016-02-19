@@ -14,7 +14,7 @@
 
   "cache-nodes": ["localhost:11211"],
   "cache-op-timeout": 200,
-  "cache-reconnection-delay": 30,
+  "cache-reconnection-delay": 1,
   "cache-on": false,
 
   "storage-default-dc": "DC01",
