@@ -16,15 +16,11 @@
            (net.spy.memcached.ops ArrayOperationQueueFactory)))
 
 (defn connect [servers reconnection-delay op-timeout]
-  (let [op-queque-length 10
-        op-queque-fac (ArrayOperationQueueFactory. op-queque-length)
-        fb (doto (ConnectionFactoryBuilder.)
+  (let [fb (doto (ConnectionFactoryBuilder.)
              (.setFailureMode FailureMode/Redistribute)
-             (.setReadBufferSize 100)
-             (.setWriteOpQueueFactory op-queque-fac)
              (.setMaxReconnectDelay reconnection-delay)     ;; seconds
-             (.setOpTimeout op-timeout)                     ;; ms
-             (.setOpQueueMaxBlockTime 10)                   ;; ms
+             (.setOpTimeout op-timeout)                     ;; ms, timeout on get op
+             (.setOpQueueMaxBlockTime 50)                   ;; ms, await for offering set op
              (.setProtocol ConnectionFactoryBuilder$Protocol/BINARY))]
     (def fac (.build fb))
     (MemcachedClient. (.build fb)
