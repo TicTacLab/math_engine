@@ -1,9 +1,7 @@
 (ns malt.calculator
   (:require
     [malt.session :as session]
-    [malt.storage
-     [cache :as cache]
-     [in-params :as in-params]]
+    [malt.cache :as cache]
     [metrics.meters :as meter]
     [malcolmx.core :as malx]
     [clojure.walk :refer [keywordize-keys]]))
@@ -27,14 +25,13 @@
                                         (mapv keywordize-keys $)
                                         (filter non-empty-outcome $)))))
 
-(defn calc [{storage :storage :as session-store}
+(defn calc [{cache :cache :as session-store}
             model-id
             event-id
             params
             profile?]
-  (meter/mark! (:calls storage))
-  (in-params/write! storage model-id params)
+  (meter/mark! (:calls cache))
   (let [workbook-config (session/create-or-prolong session-store model-id event-id)
         rev (:rev workbook-config)]
-    (cache/with-cache-by-key storage {:id model-id :rev rev :params params}
+    (cache/with-cache-by-key cache {:id model-id :rev rev :params params}
       (calc* workbook-config params profile?))))

@@ -1,14 +1,10 @@
 (ns malt.storage
   (:require [com.stuartsierra.component :as component]
             [schema.core :as s]
-            [metrics.core :as metrics]
-            [metrics.meters :as meter]
-            [zabbix-clojure-agent.gauges :as agauge]
             [clojurewerkz.cassaforte.client :as cc]
             [clojurewerkz.cassaforte.policies :as cp]
             [clojure.tools.logging :as log])
-  (:import [com.codahale.metrics RatioGauge$Ratio]
-           [com.datastax.driver.core.exceptions NoHostAvailableException]
+  (:import [com.datastax.driver.core.exceptions NoHostAvailableException]
            (com.datastax.driver.core.policies DCAwareRoundRobinPolicy)))
 
 
@@ -29,11 +25,7 @@
                     storage-keyspace
                     storage-user
                     storage-password
-                    storage-default-dc
-                    cache-hit
-                    hits
-                    calls
-                    cache-on]
+                    storage-default-dc]
   component/Lifecycle
 
   (start [component]
@@ -44,30 +36,17 @@
                                   {:credentials           {:username storage-user
                                                            :password storage-password}
                                    :reconnection-policy   (cp/constant-reconnection-policy 100)
-                                   :load-balancing-policy (DCAwareRoundRobinPolicy. storage-default-dc 2)})
-          hits (meter/meter "hits")
-          calls (meter/meter ["math_engine" "calls_rate"])]
+                                   :load-balancing-policy (DCAwareRoundRobinPolicy. storage-default-dc 2)})]
       (log/info "Storage started")
       (assoc component
-        :conn conn
-        :hits hits
-        :calls calls
-        :cache-hit (agauge/ratio-gauge-fn ["malt_engine" "cache_hit"]
-                               #(RatioGauge$Ratio/of (meter/rate-one hits)
-                                                     (meter/rate-one calls))))))
+        :conn conn)))
 
   (stop [component]
     (when conn
       (cc/disconnect conn))
-    (when hits (metrics/remove-metric "hits"))
-    (when calls (metrics/remove-metric "calls"))
-    (when cache-hit (metrics/remove-metric ["malt_engine" "cache_hit"]))
     (log/info "Storage stopped")
     (assoc component
-      :conn nil
-      :hits nil
-      :calls nil
-      :cache-hit nil)))
+      :conn nil)))
 
 
 (def StorageSchema
@@ -75,8 +54,7 @@
    :storage-keyspace s/Str
    :storage-user     s/Str
    :storage-password s/Str
-   :storage-default-dc s/Str
-   :cache-on         s/Bool})
+   :storage-default-dc s/Str})
 
 (defn new-storage [m]
   (as-> m $

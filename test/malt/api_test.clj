@@ -128,6 +128,7 @@
             (response->status+result)
             (second)
             :data
+            (>trace)
             (#(every? :timer %)))
         "every outcome should have timer")))
 

@@ -4,7 +4,6 @@
             [ring.adapter.jetty :as jetty]
             [com.stuartsierra.component :as component]
             [clojure.tools.logging :as log]
-            [malt.storage.calculation-log :as calc-log]
             [malt.calculator :refer [calc]]
             [malt.utils :refer (string-to-double string-to-integer)]
             [ring.middleware
@@ -63,7 +62,6 @@
   (let [params (mapv coerce-params-fields params)] ;; FIXME: remove coersion?
     (if-let [result (calc session-store model-id event-id params profile?)]
       (do
-        (calc-log/write! (:storage session-store) model-id event-id params result)
         (success-response 200 result))
       (return-with-log error-423-cip
                       "Calculation in progress for request: %s %s"
@@ -201,6 +199,7 @@
   (GET "/files/:model-id/:event-id/out-values-header" req (out-values-header-handler req))
   (POST "/files/:model-id/:event-id/profile" req (calc-handler req :profile? true))
   (POST "/files/:model-id/:event-id/calculate" req (calc-handler req :profile? false))
+
   (OPTIONS "/files/:model-id/:event-id/calculate" req (allow-cors))
   (DELETE "/files/:model-id/:event-id" req (destroy-session req))
   (OPTIONS "/files/:model-id/:event-id" req (allow-cors))

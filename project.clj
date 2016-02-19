@@ -22,6 +22,8 @@
                  [compojure "1.4.0"]
                  [ring "1.4.0"]
                  [dire "0.5.3"]
+                 [digest "1.4.4"]
+                 [net.spy/spymemcached "2.12.0"]
                  [org.clojure/core.cache "0.6.4"]
                  [com.betinvest/zabbix-clojure-agent "0.1.8"]]
 
