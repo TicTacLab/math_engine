@@ -43,7 +43,7 @@
                  (cache/miss table ssid
                              (-> session-store
                                  :storage
-                                 (models/get-model id)
+                                 (models/get-raw-file id)
                                  config-to-workbook
                                  (assoc :ssid ssid))))))
       (get ssid)))

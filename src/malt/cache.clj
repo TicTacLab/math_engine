@@ -12,8 +12,7 @@
            [net.spy.memcached AddrUtil]
            [net.spy.memcached MemcachedClient
                               ConnectionFactoryBuilder
-                              FailureMode ConnectionFactoryBuilder$Protocol]
-           (net.spy.memcached.ops ArrayOperationQueueFactory)))
+                              FailureMode ConnectionFactoryBuilder$Protocol]))
 
 (defn connect [servers reconnection-delay op-timeout]
   (let [fb (doto (ConnectionFactoryBuilder.)
