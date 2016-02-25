@@ -1,19 +1,33 @@
 (ns malt.storage.models
-  (:require [clojurewerkz.cassaforte.cql :as cql]
-            [clojurewerkz.cassaforte.query :refer [where columns limit]])
-  (:import (com.datastax.driver.core.utils Bytes)))
+  (:require [malt.storage :refer [sql-exception-handler]]
+            [yesql.core :refer [defqueries]]
+            [dire.core :refer [with-handler!]])
+  (:import (java.sql SQLException)
+           (javax.xml.bind DatatypeConverter)))
 
-(defn get-model [storage id]
-  (let [{:keys [conn]} storage]
-    (-> (cql/get-one conn "models"
-                     (columns :id :rev :file :file_name :in_sheet_name :out_sheet_name)
-                     (where [[= :id id]]))
-        (update-in [:file] #(Bytes/getArray %)))))
+(defn base64-decode [m ks]
+  (reduce (fn [acc k]
+            (update acc k #(DatatypeConverter/parseBase64Binary %)))
+          m ks))
+
+(defqueries "sql/files.sql")
 
 
-(defn valid-model? [storage id]
-  (let [{:keys [conn]} storage]
-    (seq (cql/select conn "models"
-                     (columns :id)
-                     (where [[= :id id]])
-                     (limit 1)))))
+;; ====== Public API
+
+(defn get-raw-file [{spec :spec} id]
+  (-> (get-raw-file* {:id id} {:connection spec})
+      first
+      (base64-decode [:file])))
+
+(with-handler! #'get-raw-file
+  SQLException
+  sql-exception-handler)
+
+
+(defn valid-model? [{spec :spec} id]
+  (seq (valid-model*? {:id id} {:connection spec})))
+
+(with-handler! #'valid-model?
+  SQLException
+  sql-exception-handler)

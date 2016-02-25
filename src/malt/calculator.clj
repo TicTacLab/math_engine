@@ -13,17 +13,17 @@
              params
              profile?]
   (session/with-locked-workbook workbook-config
-                                (let [wb (:wb workbook-config)
-                                      in-sheet-name (:in_sheet_name workbook-config)
-                                      out-sheet-name (:out_sheet_name workbook-config)
-                                      str-data (mapv #(hash-map "id" (double (:id %))
-                                                                "value" (:value %))
-                                                     params)]
-                                  (as-> wb $
-                                        (malx/update-sheet! $ in-sheet-name str-data :by "id")
-                                        (malx/get-sheet $ out-sheet-name :profile? profile?)
-                                        (mapv keywordize-keys $)
-                                        (filter non-empty-outcome $)))))
+    (let [wb (:wb workbook-config)
+          in-sheet-name (:in_sheet_name workbook-config)
+          out-sheet-name (:out_sheet_name workbook-config)
+          str-data (mapv #(hash-map "id" (double (:id %))
+                                    "value" (:value %))
+                         params)]
+      (as-> wb $
+            (malx/update-sheet! $ in-sheet-name str-data :by "id")
+            (malx/get-sheet $ out-sheet-name :profile? profile?)
+            (mapv keywordize-keys $)
+            (filter non-empty-outcome $)))))
 
 (defn calc [{cache :cache :as session-store}
             model-id
