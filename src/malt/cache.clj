@@ -12,8 +12,7 @@
            [net.spy.memcached AddrUtil]
            [net.spy.memcached MemcachedClient
                               ConnectionFactoryBuilder
-                              FailureMode ConnectionFactoryBuilder$Protocol]
-           (net.spy.memcached.ops ArrayOperationQueueFactory)))
+                              FailureMode ConnectionFactoryBuilder$Protocol]))
 
 (defn connect [servers reconnection-delay op-timeout]
   (let [fb (doto (ConnectionFactoryBuilder.)
@@ -22,14 +21,13 @@
              (.setOpTimeout op-timeout)                     ;; ms, timeout on get op
              (.setOpQueueMaxBlockTime 50)                   ;; ms, await for offering set op
              (.setProtocol ConnectionFactoryBuilder$Protocol/BINARY))]
-    (def fac (.build fb))
     (MemcachedClient. (.build fb)
                       (AddrUtil/getAddresses (join " " servers)))))
 
 (defn gen-cache-key [id rev params]
   (let [key-params (->> params
                         (sort-by :id)
-                        (map :value)
+                        (map (fn [{:keys [id value]}] (str id ":" value)))
                         (join ",")
                         (md5)
                         (doall))]
@@ -39,7 +37,8 @@
   (try
     (.set conn (gen-cache-key model-id rev params) 0 (json/generate-string value))
     (catch Exception e
-      (log/error e "Exception during cache put"))))
+      (log/error e "Exception during cache put")
+      nil)))
 
 (defn fetch [{conn :conn} {model-id :id rev :rev params :params}]
   (try
